@@ -3,24 +3,64 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>d3.js</title>
-	<!-- import d3 library -->
+	<title>dynform</title>
+	<h1>dynform</h1>
 	<style>
-		.container{
-			width: 250px;
-			height: 200px;
-			border: 1px solid #720570;
+		.box{
+			//width: 250px;
+			//height: 200px;
+			//border: 1px solid #720570;
 		}
-		.bar{
-			fill: #720570;
+		.seq{
+			//width: 200px;
+			//height: 10px;
+			//background-color: #720570;
 		}
 	</style>
-	<script src="https://d3js.org/d3.v5.min.js" defer></script>
-	<script src="https://d3js.org/d3-scale.v3.min.js" defer></script>
 	<script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </head>
 <body>
-	<!-- what will be manipulated -->
-	<svg></svg>
+	<form id="allform">
+		<div id="seq">
+			Sequences:
+			<select id="seqalpha" name="Alphabet" onchange="setalpha(this.selectedIndex)">
+				<option value="nt" selected>Nucleotides</option>
+				<option value="aa">Amino-acids</option>
+				<option value="cod">Codons</option>
+			</select>
+			<button onclick="addseq()">Add</button>
+			<div id="seqdat"></div>
+		</div>
+		<br>
+		<div id="tree">
+			Tree:
+			<button onclick="addtree()">Add</input>
+		</div>
+		<br>
+		<div id="model">
+			Model:
+			<button onclick="addmodel()">Add</input>
+		</div>
+		<br>
+		<div id="root">
+			Root:
+			<button onclick="addroot()">Add</input>
+		</div>
+		<br>
+		<div id="rate">
+			Rate:
+			<button onclick="addrate()">Add</input>
+		</div>
+		<br>
+		<div id="proc">
+			Process:
+			<button onclick="addproc()">Add</input>
+		</div>
+		<br>
+		<div id="phyl">
+			Phylogeny:
+			<button onclick="addphyl()">Add</input>
+		</div>
+	</form>
 </body>
 </html>
