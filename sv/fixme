@@ -1,13 +1,7 @@
-/* bypass cache: ^F5
- * alert(string);
- */
-
 /* FIXME: steps
  * - implement alpha, seq, tree, rate, root forms
  * - implement python script compiling html and render this data-driven
  */
-
-/* FIXME: convert to typescript */
 
 /* FIXME: seq validity: check that the alphabet is correct?
  * can be heavy client side, but then would avoid server load
@@ -46,57 +40,37 @@
  * given model -> specific options and possibilities
  */
 
-/* FIXME: tree formats
- * no js parser for Nexus files
- * there are many for newick, and 1-2 for nhx (nhx.js, tnt.newick: both)
- */
-
-var seqa = [];
-function addseq(){
-	const id = seqa.length + 1;
-	const seq = {id:id, v:"SOMESEQ"};
-	seqa.push(seq);
-
-	const d = document.createElement("div");
-	d.className = "seq";
-	d.textContent = "[" + seq.id + "] " + seq.v;
-	document.getElementById("seqdat").appendChild(d);
-}
-
-// FIXME: all possibilities
-var curalpha = document.getElementById("seqalpha").selectedIndex;
-function setalpha(v){
-	if(curalpha !== v){
-		const seqs = document.getElementById("seqdat");
-		while(seqs.hasChildNodes())
-			seqs.removeChild(seqs.firstChild);
-		seqa = [];
-		curalpha = v;
-	}
-}
-
-function addtree(){
-	// FIXME: parse nodes to be able to attribute models
-}
-
-function addmodel(){
-	// FIXME: add simple homogenous model: json with name and variables dicts
-	// FIXME: select model
-	// FIXME: add params values that won't be defaults (hash tables)
-}
-
-function addroot(){
-	// FIXME: reference a tree
-}
-
-function addrate(){
-
-}
-
-function addproc(){
-	// FIXME: reference model + tree etc
-}
-
-function addphyl(){
-	// FIXME: reference proc + data
-}
+- null checks
+- WE NEED TO GET A TEXT FILE GENERATED WITH ALL THIS SHIT, (especially?) even for the demo
+- notes
+	. bypass cache: ^F5
+	. alert(string);
+	. npx tsc --strict --noImplicitAny --noImplicitThis --alwaysStrict --noUnusedLocals --noUnusedParameters --noImplicitReturns app.ts
+- convert to typescript
+- json dict with all rules for 8 primitives
+- generation: html with all basic elements, or js/ts with all basic elements
+- why not just go with underlying graph model, regardless of representation?
+	. like, adjacency lists for dom objects, visible or not
+- idea:
+	. left pane: list of model components
+	. right pane: onselect, description
+	. group components this way, avoids all on one page
+	. still, only representation, still need data and relationships
+- alpha:
+	. all possibilities
+- addtree:
+	. parse nodes to be able to attribute models?
+	. tree formats
+		* no parser for nexus files
+		* many for newick
+		* 1-2 for nhx: nhx.js, tnt.newick
+- addmodel
+	. add simple homogenous model: json with name and variable dicts
+	. select model
+	. add params values for non-defaults (hash tables)
+- addroot
+	. reference a tree
+- addproc
+	. reference model + tree, etc
+- addphyl
+	. reference proc + data

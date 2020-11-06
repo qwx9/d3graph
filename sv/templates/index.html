@@ -21,45 +21,57 @@
 </head>
 <body>
 	<form id="allform">
-		<div id="seq">
-			Sequences:
-			<select id="seqalpha" name="Alphabet" onchange="setalpha(this.selectedIndex)">
+		<div id="alpha">
+			Alphabet:
+			<div id="alphadata">
+			<select id="alphasel" name="Alphabet" onchange="setalpha(this.selectedIndex)">
 				<option value="nt" selected>Nucleotides</option>
 				<option value="aa">Amino-acids</option>
-				<option value="cod">Codons</option>
+				<option value="cd">Codons</option>
 			</select>
+			</div>
+		</div>
+		<br>
+		<div id="seq">
+			Sequences:
 			<button onclick="addseq()">Add</button>
-			<div id="seqdat"></div>
+			<div id="seqdata"></div>
 		</div>
 		<br>
 		<div id="tree">
 			Tree:
 			<button onclick="addtree()">Add</input>
+			<div id="treedata"></div>
 		</div>
 		<br>
 		<div id="model">
 			Model:
 			<button onclick="addmodel()">Add</input>
+			<div id="modeldata"></div>
 		</div>
 		<br>
 		<div id="root">
 			Root:
 			<button onclick="addroot()">Add</input>
+			<div id="rootdata"></div>
 		</div>
 		<br>
 		<div id="rate">
 			Rate:
 			<button onclick="addrate()">Add</input>
+			<div id="ratedata"></div>
 		</div>
 		<br>
 		<div id="proc">
 			Process:
 			<button onclick="addproc()">Add</input>
+			<div id="procdata"></div>
 		</div>
 		<br>
 		<div id="phyl">
 			Phylogeny:
 			<button onclick="addphyl()">Add</input>
+			<div id="phyldata"></div>
 		</div>
 	</form>
 </body>
