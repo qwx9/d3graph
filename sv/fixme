@@ -40,6 +40,27 @@
  * given model -> specific options and possibilities
  */
 
+- demo: just give a compiled app.js and index.html
+- see lib.dom.d.ts, there's already dom manipulation shit in place
+	HTMLOptionsCollection .add(), .selectedIndex, etc
+	.cur -> attribute of option type
+- add all options for seq => json
+- add a single model for now => json
+- hide defaults, add a way to change them
+- add a way to bind aliases
+- add binding to proc and phyl
+- add submit -> compile text file and show result
+- implement suboptions
+- error checking
+	. we know ahead of time what's missing
+	. or do we? what happens if we add aliases etc?
+	. might not be an issue
+	. in other words, barring other problems during compilations,
+	we can warn of missing shit ahead of time,
+	just by keeping track of a todo list
+
+
+
 - null checks
 - WE NEED TO GET A TEXT FILE GENERATED WITH ALL THIS SHIT, (especially?) even for the demo
 - notes

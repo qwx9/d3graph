@@ -56,17 +56,39 @@ class Primitive{
 	readonly name: string;
 	readonly root: Dom;
 	readonly data: Dom;
+	readonly rules: Rule[];
 	cur: number | null;
 
-	constructor(tag: string){
+	constructor(tag: string, sel: boolean = false){
 		this.name = tag;
 		this.root = new Dom(tag);
 		this.data = new Dom(tag + "data");
-		const sel = document.getElementById(tag + "sel");
-		this.cur = sel ? (sel as HTMLSelectElement).selectedIndex : null;
+		this.rules = rules[tag];
+		this.cur = null;
+		if(sel)
+			this.mkselect();
+	}
+	private addoption(value: string): HTMLOptionElement{
+		const d: HTMLElement = document.createElement("option");
+		if(d === null){
+			fatal("addoption: couldn't create an option element");
+		}
+		this.data.dom.appendChild(d);
+		const o: HTMLOptionElement = d as HTMLOptionElement;
+		o.value = value;
+		o.textContent = value;
+		return o;
+	}
+	private mkselect(): void{
+		this.rules.forEach((v) => {
+			this.addoption(v.label);
+		});
+		this.cur = 0;
 	}
 	add(): {i: number, dom: HTMLElement}{
 		const d: HTMLElement = document.createElement("div");
+		if(d === null)
+			fatal("add: couldn't create a div element");
 		d.className = this.name + "obj";
 
 		const dom = this.data.dom;
@@ -80,7 +102,7 @@ class Primitive{
 	}
 }
 let prim: { [name: string]: Primitive; } = {
-	"alpha": new Primitive("alpha"),
+	"alpha": new Primitive("alpha", true),
 	"seq": new Primitive("seq"),
 	"tree": new Primitive("tree"),
 	"model": new Primitive("model"),
