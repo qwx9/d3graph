@@ -3,6 +3,41 @@ function fatal(err: string){
 	throw new Error(err);
 }
 
+class Rule{
+	label: string;
+	sym: string;
+	val: Rule[] | number | null;
+
+	constructor(label: string, val: number | Rule[] | null = null, sym?: string){
+		this.label = label;
+		this.sym = sym ? sym : label;
+		this.val = val;
+	}
+}
+const rules: { [name: string]: Rule[]; } = {
+	"alpha": [
+		new Rule("DNA", []),
+		new Rule("RNA", []),
+		new Rule("Protein", []),
+		new Rule("Binary", []),
+		new Rule("Word", [
+			new Rule("Letter", [
+				new Rule("DNA", []),
+				new Rule("RNA", []),
+				new Rule("Protein", []),
+			], "letter"),
+			new Rule("Length", 1, "length"),
+
+		]),
+		new Rule("Codon", [
+			new Rule("Letter", [
+				new Rule("DNA", []),
+				new Rule("RNA", []),
+			], "letter"),
+		]),
+	],
+};
+
 class Dom{
 	readonly id: string;
 	readonly dom: HTMLElement;
@@ -17,7 +52,6 @@ class Dom{
 		}
 	}
 }
-
 class Primitive{
 	readonly name: string;
 	readonly root: Dom;
@@ -37,7 +71,6 @@ class Primitive{
 			dom.removeChild(dom.firstChild as ChildNode);
 	}
 }
-
 let prim: { [name: string]: Primitive; } = {
 	"alpha": new Primitive("alpha"),
 	"seq": new Primitive("seq"),
