@@ -65,6 +65,14 @@ class Primitive{
 		const sel = document.getElementById(tag + "sel");
 		this.cur = sel ? (sel as HTMLSelectElement).selectedIndex : null;
 	}
+	add(): {i: number, dom: HTMLElement}{
+		const d: HTMLElement = document.createElement("div");
+		d.className = this.name + "obj";
+
+		const dom = this.data.dom;
+		dom.appendChild(d);
+		return {i: dom.childElementCount, dom: d};
+	}
 	nuke(): void{
 		const dom: HTMLElement = this.data.dom;
 		while(dom.hasChildNodes())
@@ -91,15 +99,8 @@ function setalpha(v: number): void{
 }
 
 function addseq(): void{
-	const p: Primitive = prim["seq"];
-	const d: HTMLElement = document.createElement("div");
-	d.className = p.name + "obj";
-
-	const id: number = p.data.dom.childElementCount + 1;
-	const v: string = "SOMESEQ";
-	d.textContent = "[" + id + "] " + v;
-
-	p.data.dom.appendChild(d);
+	const v = prim["seq"].add();
+	v.dom.textContent = "[" + v.i + "] " + "SOMESEQ";
 }
 
 function addtree(){
