@@ -45,8 +45,6 @@
 - notes
 	. bypass cache: ^F5
 	. alert(string);
-	. npx tsc --strict --noImplicitAny --noImplicitThis --alwaysStrict --noUnusedLocals --noUnusedParameters --noImplicitReturns app.ts
-- convert to typescript
 - json dict with all rules for 8 primitives
 - generation: html with all basic elements, or js/ts with all basic elements
 - why not just go with underlying graph model, regardless of representation?
