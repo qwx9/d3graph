@@ -3,8 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>dynform</title>
-	<h1>dynform</h1>
+	<title>query</title>
 	<style>
 		.box{
 			//width: 250px;
@@ -23,51 +22,72 @@
 	<!--form id="allform"-->
 		<div id="alpha">
 			Alphabet:
-			<select id="alphadata" name="Alphabet" onchange="setalpha(this.selectedIndex)">
-			</select>
+			<select id="alphasel" name="Alphabet" onchange="setalpha(this.selectedIndex)"></select>
+			<div id="alphadata"></div>
+		</div>
+		<br>
+		<div id="index1">
+			Index1:
+			<select id="index1sel" name="Type" onchange="setindex1(this.selectedIndex)"></select>
+			<div id="index1data"></div>
+		</div>
+		<br>
+		<div id="index2">
+			Index2:
+			<select id="index2sel" name="Type" onchange="setindex2(this.selectedIndex)"></select>
+			<div id="index2data"></div>
 		</div>
 		<br>
 		<div id="seq">
 			Sequences:
+			<select id="seqsel" name="Type" onchange="setseq(this.selectedIndex)"></select>
 			<button onclick="addseq()">Add</button>
 			<div id="seqdata"></div>
 		</div>
 		<br>
 		<div id="tree">
 			Tree:
+			<select id="treesel" name="Type" onchange="settree(this.selectedIndex)"></select>
 			<button onclick="addtree()">Add</input>
 			<div id="treedata"></div>
 		</div>
 		<br>
 		<div id="model">
 			Model:
+			<select id="modelsel" name="Type" onchange="setmodel(this.selectedIndex)"></select>
 			<button onclick="addmodel()">Add</input>
 			<div id="modeldata"></div>
 		</div>
 		<br>
 		<div id="root">
 			Root:
+			<select id="rootsel" name="Type" onchange="setroot(this.selectedIndex)"></select>
 			<button onclick="addroot()">Add</input>
 			<div id="rootdata"></div>
 		</div>
 		<br>
 		<div id="rate">
 			Rate:
+			<select id="ratesel" name="Type" onchange="setrate(this.selectedIndex)"></select>
 			<button onclick="addrate()">Add</input>
 			<div id="ratedata"></div>
 		</div>
 		<br>
 		<div id="proc">
 			Process:
+			<select id="procsel" name="Type" onchange="setproc(this.selectedIndex)"></select>
 			<button onclick="addproc()">Add</input>
 			<div id="procdata"></div>
 		</div>
 		<br>
 		<div id="phyl">
 			Phylogeny:
+			<select id="phylsel" name="Type" onchange="setphyl(this.selectedIndex)"></select>
 			<button onclick="addphyl()">Add</input>
 			<div id="phyldata"></div>
 		</div>
+		<br>
+		<button onclick="submit()">Submit</input>
 	<!--/form-->
 </body>
 </html>

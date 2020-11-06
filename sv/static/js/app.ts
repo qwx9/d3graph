@@ -36,50 +36,90 @@ const rules: { [name: string]: Rule[]; } = {
 			], "letter"),
 		]),
 	],
+	"index1": [
+		new Rule("None", []),
+	],
+	"index2": [
+		new Rule("None", []),
+	],
+	"seq": [
+		new Rule("Fasta", []),
+		new Rule("Mase", []),
+		new Rule("Phylip", []),
+		new Rule("Clustal", []),
+		new Rule("Dcse", []),
+		new Rule("Nexus", []),
+		new Rule("Genbank", []),
+	],
+	"tree": [
+		new Rule("Newick", []),
+		new Rule("Nexus", []),
+		new Rule("NHX", []),
+	],
+	"model": [
+		new Rule("HKY85", []),
+	],
+	"root": [
+	],
+	"rate": [
+	],
+	"proc": [
+	],
+	"phyl": [
+	],
 };
 
-class Dom{
+class Seldom{
 	readonly id: string;
-	readonly dom: HTMLDivElement | HTMLSelectElement;
+	readonly dom: HTMLSelectElement;
 
 	constructor(id: string){
 		this.id = id;
 		const el = document.getElementById(id);
-		this.dom = el as HTMLDivElement | HTMLSelectElement;
+		this.dom = el as HTMLSelectElement;
 		if(el === null)
-			fatal("Dom: no such element " + id);
+			fatal("Seldom: no such element " + id);
+	}
+}
+class Datdom{
+	readonly id: string;
+	readonly dom: HTMLDivElement;
+
+	constructor(id: string){
+		this.id = id;
+		const el = document.getElementById(id);
+		this.dom = el as HTMLDivElement;
+		if(el === null)
+			fatal("Datdom: no such element " + id);
 	}
 }
 class Primitive{
 	readonly name: string;
-	readonly root: Dom;
-	readonly data: Dom;
+	readonly root: Datdom;
+	readonly sel: Seldom;
+	readonly data: Datdom;
 	readonly rules: Rule[];
-	cur: number | null;
+	cur: number;
 
-	constructor(tag: string, sel: boolean = false){
+	constructor(tag: string){
 		this.name = tag;
-		this.root = new Dom(tag);
-		this.data = new Dom(tag + "data");
+		this.root = new Datdom(tag);
+		this.data = new Datdom(tag + "data");
+		this.sel = new Seldom(tag + "sel");
 		this.rules = rules[tag];
-		this.cur = null;
-		if(sel)
-			this.mkselect();
+		this.cur = 0;
+		this.rules.forEach((v) => {
+			this.addoption(v.label);
+		});
 	}
 	private addoption(value: string): HTMLOptionElement{
 		const o: HTMLOptionElement = document.createElement("option");
 		if(o === null)
 			fatal("addoption: couldn't create an option element");
-		(this.data.dom as HTMLSelectElement).add(o);
+		this.sel.dom.add(o);
 		o.value = value;
 		o.textContent = value;
 		return o;
-	}
-	private mkselect(): void{
-		this.rules.forEach((v) => {
-			this.addoption(v.label);
-		});
-		this.cur = 0;
 	}
 	add(): {i: number, dom: HTMLDivElement}{
 		const d: HTMLDivElement = document.createElement("div");
@@ -96,7 +136,9 @@ class Primitive{
 	}
 }
 let prim: { [name: string]: Primitive; } = {
-	"alpha": new Primitive("alpha", true),
+	"alpha": new Primitive("alpha"),
+	"index1": new Primitive("index1"),
+	"index2": new Primitive("index2"),
 	"seq": new Primitive("seq"),
 	"tree": new Primitive("tree"),
 	"model": new Primitive("model"),
@@ -114,31 +156,72 @@ function setalpha(v: number): void{
 	}
 }
 
+function setindex1(v: number): void{
+	prim["index1"].cur = v;
+}
+
+function setindex2(v: number): void{
+	prim["index2"].cur = v;
+}
+
+function setseq(v: number): void{
+	prim["seq"].cur = v;
+}
 function addseq(): void{
-	const v = prim["seq"].add();
-	v.dom.textContent = "[" + v.i + "] " + "SOMESEQ";
+	const p = prim["seq"];
+	const {i, dom} = p.add();
+	dom.textContent = "[" + i + "] " + p.sel.dom.options[p.cur].value;
 }
 
-function addtree(){
+function settree(v: number): void{ prim["tree"].cur = v;
+	prim["tree"].cur = v;
+}
+function addtree(): void{
+	const p = prim["tree"];
+	const {i, dom} = p.add();
+	dom.textContent = "[" + i + "] " + p.sel.dom.options[p.cur].value;
+}
+
+function setmodel(v: number): void{
+	prim["model"].cur = v;
+
+}
+function addmodel(): void{
+	const p = prim["model"];
+	const {i, dom} = p.add();
+	dom.textContent = "[" + i + "] " + p.sel.dom.options[p.cur].value;
+}
+
+function setroot(v: number): void{
+	prim["root"].cur = v;
+
+}
+function addroot(): void{
 
 }
 
-function addmodel(){
+function setrate(v: number): void{
+	prim["rate"].cur = v;
+
+}
+function addrate(): void{
 
 }
 
-function addroot(){
+function setproc(v: number): void{
+	prim["proc"].cur = v;
+}
+function addproc(): void{
 
 }
 
-function addrate(){
+function setphyl(v: number): void{
+	prim["phyl"].cur = v;
+}
+function addphyl(): void{
 
 }
 
-function addproc(){
-
-}
-
-function addphyl(){
+function submit(): void{
 
 }

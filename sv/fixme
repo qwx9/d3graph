@@ -41,9 +41,6 @@
  */
 
 - demo: just give a compiled app.js and index.html
-- see lib.dom.d.ts, there's already dom manipulation shit in place
-	HTMLOptionsCollection .add(), .selectedIndex, etc
-	.cur -> attribute of option type
 - add all options for seq => json
 - add a single model for now => json
 - hide defaults, add a way to change them
@@ -58,6 +55,11 @@
 	. in other words, barring other problems during compilations,
 	we can warn of missing shit ahead of time,
 	just by keeping track of a todo list
+- add/set: generalize
+	. read possible primitives from html
+	. each with some kind of generic add/set
+
+- index1, index2: accessoire
 
 
 
