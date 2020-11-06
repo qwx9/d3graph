@@ -40,16 +40,14 @@ const rules: { [name: string]: Rule[]; } = {
 
 class Dom{
 	readonly id: string;
-	readonly dom: HTMLElement;
+	readonly dom: HTMLDivElement | HTMLSelectElement;
 
 	constructor(id: string){
 		this.id = id;
 		const el = document.getElementById(id);
-		this.dom = el as HTMLElement;
-		if(el === null){
+		this.dom = el as HTMLDivElement | HTMLSelectElement;
+		if(el === null)
 			fatal("Dom: no such element " + id);
-			return;
-		}
 	}
 }
 class Primitive{
@@ -69,12 +67,10 @@ class Primitive{
 			this.mkselect();
 	}
 	private addoption(value: string): HTMLOptionElement{
-		const d: HTMLElement = document.createElement("option");
-		if(d === null){
+		const o: HTMLOptionElement = document.createElement("option");
+		if(o === null)
 			fatal("addoption: couldn't create an option element");
-		}
-		this.data.dom.appendChild(d);
-		const o: HTMLOptionElement = d as HTMLOptionElement;
+		(this.data.dom as HTMLSelectElement).add(o);
 		o.value = value;
 		o.textContent = value;
 		return o;
@@ -85,10 +81,8 @@ class Primitive{
 		});
 		this.cur = 0;
 	}
-	add(): {i: number, dom: HTMLElement}{
-		const d: HTMLElement = document.createElement("div");
-		if(d === null)
-			fatal("add: couldn't create a div element");
+	add(): {i: number, dom: HTMLDivElement}{
+		const d: HTMLDivElement = document.createElement("div");
 		d.className = this.name + "obj";
 
 		const dom = this.data.dom;
