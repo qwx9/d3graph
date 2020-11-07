@@ -40,14 +40,12 @@
  * given model -> specific options and possibilities
  */
 
-- demo: just give a compiled app.js and index.html
-- add all options for seq => json
 - add a single model for now => json
 - hide defaults, add a way to change them
 - add a way to bind aliases
 - add binding to proc and phyl
 - add submit -> compile text file and show result
-- implement suboptions
+- implement suboptions, defaults
 - error checking
 	. we know ahead of time what's missing
 	. or do we? what happens if we add aliases etc?
@@ -55,11 +53,9 @@
 	. in other words, barring other problems during compilations,
 	we can warn of missing shit ahead of time,
 	just by keeping track of a todo list
-- add/set: generalize
-	. read possible primitives from html
-	. each with some kind of generic add/set
 
 - index1, index2: accessoire
+- mandatory .profile to ease everything else
 
 
 
@@ -68,8 +64,6 @@
 - notes
 	. bypass cache: ^F5
 	. alert(string);
-- json dict with all rules for 8 primitives
-- generation: html with all basic elements, or js/ts with all basic elements
 - why not just go with underlying graph model, regardless of representation?
 	. like, adjacency lists for dom objects, visible or not
 - idea:
@@ -77,8 +71,6 @@
 	. right pane: onselect, description
 	. group components this way, avoids all on one page
 	. still, only representation, still need data and relationships
-- alpha:
-	. all possibilities
 - addtree:
 	. parse nodes to be able to attribute models?
 	. tree formats

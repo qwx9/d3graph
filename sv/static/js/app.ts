@@ -99,15 +99,17 @@ class Primitive{
 	readonly sel: Seldom;
 	readonly data: Datdom;
 	readonly rules: Rule[];
+	readonly curfn: (() => void) | null;
 	cur: number;
 
-	constructor(tag: string){
+	constructor(tag: string, curfn: (() => void) | null = null){
 		this.name = tag;
 		this.root = new Datdom(tag);
 		this.data = new Datdom(tag + "data");
 		this.sel = new Seldom(tag + "sel");
 		this.rules = rules[tag];
 		this.cur = 0;
+		this.curfn = curfn;
 		this.rules.forEach((v) => {
 			this.addoption(v.label);
 		});
@@ -121,13 +123,22 @@ class Primitive{
 		o.textContent = value;
 		return o;
 	}
-	add(): {i: number, dom: HTMLDivElement}{
+	setcur(i: number): void{
+		if(this.cur !== i && this.curfn !== null)
+			this.curfn();
+		this.cur = i;
+	}
+	appendchild(): {i: number, dom: HTMLDivElement}{
 		const d: HTMLDivElement = document.createElement("div");
 		d.className = this.name + "obj";
 
 		const dom = this.data.dom;
 		dom.appendChild(d);
 		return {i: dom.childElementCount, dom: d};
+	}
+	add(): void{
+		const {i, dom} = this.appendchild();
+		dom.textContent = "[" + i + "] " + this.sel.dom.options[this.cur].value;
 	}
 	nuke(): void{
 		const dom: HTMLElement = this.data.dom;
@@ -136,7 +147,9 @@ class Primitive{
 	}
 }
 let prim: { [name: string]: Primitive; } = {
-	"alpha": new Primitive("alpha"),
+	"alpha": new Primitive("alpha", () => {
+		prim["seq"].nuke();
+	}),
 	"index1": new Primitive("index1"),
 	"index2": new Primitive("index2"),
 	"seq": new Primitive("seq"),
@@ -148,80 +161,12 @@ let prim: { [name: string]: Primitive; } = {
 	"phyl": new Primitive("phyl"),
 };
 
-function setalpha(v: number): void{
-	const p: Primitive = prim["alpha"];
-	if(p.cur !== v){
-		p.cur = v;
-		prim["seq"].nuke();
-	}
+function setcur(name: string, i: number): void{
+	prim[name].setcur(i);
 }
-
-function setindex1(v: number): void{
-	prim["index1"].cur = v;
+function add(name: string): void{
+	prim[name].add();
 }
-
-function setindex2(v: number): void{
-	prim["index2"].cur = v;
-}
-
-function setseq(v: number): void{
-	prim["seq"].cur = v;
-}
-function addseq(): void{
-	const p = prim["seq"];
-	const {i, dom} = p.add();
-	dom.textContent = "[" + i + "] " + p.sel.dom.options[p.cur].value;
-}
-
-function settree(v: number): void{ prim["tree"].cur = v;
-	prim["tree"].cur = v;
-}
-function addtree(): void{
-	const p = prim["tree"];
-	const {i, dom} = p.add();
-	dom.textContent = "[" + i + "] " + p.sel.dom.options[p.cur].value;
-}
-
-function setmodel(v: number): void{
-	prim["model"].cur = v;
-
-}
-function addmodel(): void{
-	const p = prim["model"];
-	const {i, dom} = p.add();
-	dom.textContent = "[" + i + "] " + p.sel.dom.options[p.cur].value;
-}
-
-function setroot(v: number): void{
-	prim["root"].cur = v;
-
-}
-function addroot(): void{
-
-}
-
-function setrate(v: number): void{
-	prim["rate"].cur = v;
-
-}
-function addrate(): void{
-
-}
-
-function setproc(v: number): void{
-	prim["proc"].cur = v;
-}
-function addproc(): void{
-
-}
-
-function setphyl(v: number): void{
-	prim["phyl"].cur = v;
-}
-function addphyl(): void{
-
-}
-
 function submit(): void{
 
 }
