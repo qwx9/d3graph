@@ -43,10 +43,30 @@ const rules: { [name: string]: Rule[]; } = {
 		new Rule("None", []),
 	],
 	"seq": [
-		new Rule("Fasta", []),
-		new Rule("Mase", []),
-		new Rule("Phylip", []),
-		new Rule("Clustal", []),
+		new Rule("Fasta", [
+			new Rule("extended", 0),
+			new Rule("strictNames", 0),
+		]),
+		new Rule("Mase", [
+			new Rule("siteSelection", 1),
+		]),
+		new Rule("Phylip", [
+			new Rule("order", [
+				new Rule("interleaved", []),
+				new Rule("sequential", []),
+			]),
+			new Rule("type", [
+				new Rule("classic", []),
+				new Rule("extended", []),
+			]),
+			new Rule("split", [
+				new Rule("spaces", []),
+				new Rule("tab", []),
+			]),
+		]),
+		new Rule("Clustal", [
+			new Rule("extraSpaces", 0),
+		]),
 		new Rule("Dcse", []),
 		new Rule("Nexus", []),
 		new Rule("Genbank", []),
@@ -57,14 +77,61 @@ const rules: { [name: string]: Rule[]; } = {
 		new Rule("NHX", []),
 	],
 	"model": [
+		new Rule("JC69", []),
+		new Rule("K80", [
+			new Rule("kappa", 1),
+		]),
+		new Rule("F84", [
+			new Rule("kappa", 0.1),
+			new Rule("theta", 0.1),
+			new Rule("theta1", 0.1),
+			new Rule("theta2", 0.1),
+			// FIXME: equilibrium frequencies, everywhere
+		]),
 		new Rule("HKY85", [
+			new Rule("kappa", 0.1),
+			new Rule("theta", 0.1),
+			new Rule("theta1", 0.1),
+			new Rule("theta2", 0.1),
+		]),
+		new Rule("T92", [
+			new Rule("kappa", 0.1),
+			new Rule("theta", 0.1),
+		]),
+		new Rule("TN93", [
+			new Rule("kappa1", 0.1),
+			new Rule("kappa2", 0.1),
+			new Rule("theta", 0.1),
+			new Rule("theta1", 0.1),
+			new Rule("theta2", 0.1),
+		]),
+		new Rule("testmodel", [
 			new Rule("test", []),
-			new Rule("test2", []),
+			new Rule("test2", [
+				new Rule("more", 9001),
+				new Rule("moremore", 0.1),
+				new Rule("stuff", [
+					new Rule("end", 89),
+				]),
+			]),
 			new Rule("testval", 42),
 		]),
-		new Rule("HKY85-1", 44),
+		new Rule("testmodel-1", 44),
 	],
 	"root": [
+		new Rule("Frequency set", [
+			new Rule("Fixed", []),
+			new Rule("GC", [
+				new Rule("theta", 0.1),
+			]),
+		]),
+		new Rule("Rate distribution", [
+			new Rule("Constant", []),
+			new Rule("Gamma", [
+				new Rule("n", 2),
+				new Rule("alpha", 0.5),
+			]),
+		]),
 	],
 	"rate": [
 	],
@@ -77,31 +144,43 @@ const rules: { [name: string]: Rule[]; } = {
 class Obj{
 	readonly rule: Rule;
 	readonly div: HTMLDivElement;
-	readonly input: HTMLInputElement | HTMLSelectElement;
+	readonly input: HTMLInputElement | HTMLSelectElement | null;
 	readonly ref: string;
+	readonly idx: number;
 	val: Obj[] | number;
 
 	constructor(rule: Rule, div: HTMLDivElement, idx: number, parent: Obj | null = null){
+		this.idx = idx;
 		this.rule = rule;
 		this.div = div;
 		this.ref = (parent !== null) ? parent.ref : div.id;
-		this.ref += ":" + rule.label + idx;
-		const {input:i, val:v} = this.init(idx);
+		this.ref += ":" + rule.label + "_" + idx;
+		const {input:i, val:v} = this.init();
 		this.input = i;
 		this.val = v;
 	}
-	init(idx: number){
+	init(){
 		const lab: HTMLSpanElement = document.createElement("span");
 		let input: HTMLInputElement | HTMLSelectElement;
 		let val: Obj[] | number;
-		lab.textContent = "[" + idx + "] " + this.rule.label;
+		lab.textContent = "[" + this.idx + "] " + this.rule.label;
 		this.div.appendChild(lab);
 
 		if(this.rule.val instanceof Array){
 			const r: Rule[] = this.rule.val as Rule[];
+			if(r.length === 0)
+				return {input:null, val:-1};
+
 			const sel = document.createElement("select") as HTMLSelectElement;
+			const o = document.createElement("option") as HTMLOptionElement;
+			o.defaultSelected = true;
+			o.selected = true;
+			o.disabled = true;
+			o.text = " -- ";
+			sel.add(o);
 			r.forEach((v) => {
 				const o = document.createElement("option") as HTMLOptionElement;
+				// FIXME: everywhere? wrap?
 				if(o === null)
 					fatal("obj: couldn't create an option element");
 				o.value = v.label;
@@ -109,7 +188,7 @@ class Obj{
 				sel.add(o);
 			});
 			/* fuck this world */
-			sel.addEventListener("change", () => {
+			sel.addEventListener("input", () => {
 				this.setsel(this);
 			});
 			this.div.appendChild(sel);
@@ -133,18 +212,23 @@ class Obj{
 		alert("setval " + o.val + " in " + o.ref);
 	}
 	setsel(o: Obj){
-		// FIXME: push new object, same structure, we need another root div
-		// FIXME: select first, default, element -> nothing, we need nothing selected
+		const sel = this.input as HTMLSelectElement;
+		const i = sel.selectedIndex - 1;
+		const r = (this.rule.val as Rule[])[i];
+
+		// FIXME: record index or just get from dom later?
+		// FIXME: this allows params with no value not being saved
+		//	but then such params don't make sense
+		if(r.val instanceof Array && r.val.length == 0)
+			return;
 
 		const d: HTMLDivElement = document.createElement("div");
 		this.div.appendChild(d);
 
-		// FIXME: wrong, must be number of same obj
-		//const i = this.div.childElementCount;
-		const el = (this.input as HTMLSelectElement).selectedIndex;
-		const r = (this.rule.val as Rule[])[el];
-		const obj = new Obj(r, d, 1, o);
+		const obj = new Obj(r, d, this.idx, o);
 		(this.val as Obj[]).push(obj);
+
+		sel.selectedIndex = 0;
 	}
 };
 
@@ -221,6 +305,16 @@ class Primitive{
 		const obj = new Obj(this.rules[this.cur], d, i);
 		this.obj.push(obj);
 	}
+	setone(i: number){
+		this.setcur(i);
+		// FIXME: better, mutable root obj? not an obj?
+		if(this.obj.length !== 0){
+			this.obj = [];
+			this.data.dom.innerHTML = "";
+		}
+		const obj = new Obj(this.rules[this.cur], this.data.dom, 1);
+		this.obj.push(obj);
+	}
 	nuke(): void{
 		const dom: HTMLElement = this.data.dom;
 		while(dom.hasChildNodes())
@@ -245,6 +339,9 @@ let prim: { [name: string]: Primitive; } = {
 
 function setcur(name: string, i: number): void{
 	prim[name].setcur(i);
+}
+function setone(name: string, i: number): void{
+	prim[name].setone(i);
 }
 function add(name: string): void{
 	prim[name].add();

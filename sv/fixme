@@ -1,89 +1,51 @@
-/* FIXME: steps
- * - implement alpha, seq, tree, rate, root forms
- * - implement python script compiling html and render this data-driven
- */
-
-/* FIXME: seq validity: check that the alphabet is correct?
- * can be heavy client side, but then would avoid server load
- * but then responsiveness would take a hit
- * problem: too many formats and some we can't handle
- * should secure and send to server and either return error or detect that all is ok
- * if error, should not keep data if user leaves page (or other conditions?)
- *	must prevent any server-side meddling
- */
-
-/* FIXME: submit validation
- * form with onsubmit="return(validate());" with validate our function
- * if valid, compile and set content of form before submitting
- * content = form + multiple files
- */
-
-/* FIXME: select file to upload, do not display more than file name
- * how to upload separate files: <input type="file" multiple> within form
- * => seqs, trees
- */
-
-/* FIXME: data-oriented approach: don't hardcode anything in html/js
- * rather, compile html beforehand with a script just like the typescript
- * then get stuff from it in the js
- * hybrid: script parsing json into html and loaded into js, but now there's a vector for error
- * synthesize the html for the different divs using a python/R lib or w/e
- *	or if it's just a simple file with the hierarchy/key-value, can use awk etc
- *	but others won't be able to change it because ain't no one know awk
- *	just a json then + python, we already use flask
- */
-
-/* FIXME: input: see biopp manual for all possibilities
- * encode in some key-value store, insert in html, write general code here
- * most if not all is hierarchical
- * alphabet=Codon -> all seqs are prot -> specific models -> specific params
- * given model -> specific options and possibilities
- */
-
-- add a single model for now => json
-- hide defaults, add a way to change them
-- add a way to bind aliases
-- add binding to proc and phyl
+- data types: bool, string, bounded real (]0,1[ etc), proportion, etc.
+- frequency set: must select one (default), can't just dangle
+- implement cross-object references: seq, tree, model, etc.
+	. practically everything can be referenced
+	. but referencing another object is restricted
+- implement cross-object suboptions references and aliasing
+- remove objects
 - add submit -> compile text file and show result
-- implement suboptions, defaults
-- error checking
+- error checking: keep track of what's needed: constraints unmet
 	. we know ahead of time what's missing
 	. or do we? what happens if we add aliases etc?
 	. might not be an issue
 	. in other words, barring other problems during compilations,
 	we can warn of missing shit ahead of time,
 	just by keeping track of a todo list
-
+	. update: delete/add/modify shit
+- add a way to name and reference tree nodes
+	. default names, or indices from files?
+	. no error checking since we can't parse tree anyway
+	. just always use indices for nodes?
+	. user could specify tree shape?
+- implement selecting a file, saving filepath
+- variable naming in bpp: model1-2-3: model1 parameter _1, see how shit is automatically named
+	. important for references
+	. HKY85.kappa_1, not model1.kappa
+	. but in spec: process1=Nonhomogeneous(model1=1, model2=2)
+		tree=2, rate=1, etc.
+- actually submit data to server
+- serialization + pov of model collections -> verification/inconsistance: suppression, ajout de modeles, ref, etc
+- if there's an error on input which bppml detects immediately:
+	. show query page with same parametrization and error messages
+	. allow basically recompiling the config and sending new files
+		* or keeping old otherwise
+- implement all options from bpp manual
+	. some are hierarchical: one alphabel -> set of possible models
+- fix seldom/datdom silliness
 - index1, index2: accessoire
-- mandatory .profile to ease everything else
-
-
-
-- null checks
-- WE NEED TO GET A TEXT FILE GENERATED WITH ALL THIS SHIT, (especially?) even for the demo
-- notes
-	. bypass cache: ^F5
-	. alert(string);
-- why not just go with underlying graph model, regardless of representation?
-	. like, adjacency lists for dom objects, visible or not
-- idea:
+- output mandatory .profile to ease postprocessing
+- null checks, other error checking, asserts
+- presentation idea:
+	. tabs?
 	. left pane: list of model components
 	. right pane: onselect, description
 	. group components this way, avoids all on one page
 	. still, only representation, still need data and relationships
-- addtree:
-	. parse nodes to be able to attribute models?
-	. tree formats
-		* no parser for nexus files
-		* many for newick
-		* 1-2 for nhx: nhx.js, tnt.newick
-- addmodel
-	. add simple homogenous model: json with name and variable dicts
-	. select model
-	. add params values for non-defaults (hash tables)
-- addroot
-	. reference a tree
-- addproc
-	. reference model + tree, etc
-- addphyl
-	. reference proc + data
+- could also hide/unhide obj panes via css or w/e
+- csshit for pretty
+- re-check visualization if time remains
+- notes
+	. bypass cache: ^F5
+	. alert(string);
