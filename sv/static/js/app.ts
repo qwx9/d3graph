@@ -57,7 +57,12 @@ const rules: { [name: string]: Rule[]; } = {
 		new Rule("NHX", []),
 	],
 	"model": [
-		new Rule("HKY85", []),
+		new Rule("HKY85", [
+			new Rule("test", []),
+			new Rule("test2", []),
+			new Rule("testval", 42),
+		]),
+		new Rule("HKY85-1", 44),
 	],
 	"root": [
 	],
@@ -67,6 +72,80 @@ const rules: { [name: string]: Rule[]; } = {
 	],
 	"phyl": [
 	],
+};
+
+class Obj{
+	readonly rule: Rule;
+	readonly div: HTMLDivElement;
+	readonly input: HTMLInputElement | HTMLSelectElement;
+	readonly ref: string;
+	val: Obj[] | number;
+
+	constructor(rule: Rule, div: HTMLDivElement, idx: number, parent: Obj | null = null){
+		this.rule = rule;
+		this.div = div;
+		this.ref = (parent !== null) ? parent.ref : div.id;
+		this.ref += ":" + rule.label + idx;
+		const {input:i, val:v} = this.init(idx);
+		this.input = i;
+		this.val = v;
+	}
+	init(idx: number){
+		const lab: HTMLSpanElement = document.createElement("span");
+		let input: HTMLInputElement | HTMLSelectElement;
+		let val: Obj[] | number;
+		lab.textContent = "[" + idx + "] " + this.rule.label;
+		this.div.appendChild(lab);
+
+		if(this.rule.val instanceof Array){
+			const r: Rule[] = this.rule.val as Rule[];
+			const sel = document.createElement("select") as HTMLSelectElement;
+			r.forEach((v) => {
+				const o = document.createElement("option") as HTMLOptionElement;
+				if(o === null)
+					fatal("obj: couldn't create an option element");
+				o.value = v.label;
+				o.textContent = v.label;
+				sel.add(o);
+			});
+			/* fuck this world */
+			sel.addEventListener("change", () => {
+				this.setsel(this);
+			});
+			this.div.appendChild(sel);
+			input = sel;
+			val = [];
+		}else{
+			const num = document.createElement("input") as HTMLInputElement;
+			num.type = "text";
+			num.value = (this.rule.val as number).toString();
+			num.addEventListener("change", () => {
+				this.setval(this);
+			});
+			this.div.appendChild(num);
+			input = num;
+			val = this.rule.val as number;
+		}
+		return {input:input, val:val};
+	}
+	setval(o: Obj){
+		o.val = Number((o.input as HTMLInputElement).value);
+		alert("setval " + o.val + " in " + o.ref);
+	}
+	setsel(o: Obj){
+		// FIXME: push new object, same structure, we need another root div
+		// FIXME: select first, default, element -> nothing, we need nothing selected
+
+		const d: HTMLDivElement = document.createElement("div");
+		this.div.appendChild(d);
+
+		// FIXME: wrong, must be number of same obj
+		//const i = this.div.childElementCount;
+		const el = (this.input as HTMLSelectElement).selectedIndex;
+		const r = (this.rule.val as Rule[])[el];
+		const obj = new Obj(r, d, 1, o);
+		(this.val as Obj[]).push(obj);
+	}
 };
 
 class Seldom{
@@ -100,6 +179,7 @@ class Primitive{
 	readonly data: Datdom;
 	readonly rules: Rule[];
 	readonly curfn: (() => void) | null;
+	obj: Obj[];
 	cur: number;
 
 	constructor(tag: string, curfn: (() => void) | null = null){
@@ -113,6 +193,7 @@ class Primitive{
 		this.rules.forEach((v) => {
 			this.addoption(v.label);
 		});
+		this.obj = [];
 	}
 	private addoption(value: string): HTMLOptionElement{
 		const o: HTMLOptionElement = document.createElement("option");
@@ -128,22 +209,23 @@ class Primitive{
 			this.curfn();
 		this.cur = i;
 	}
-	appendchild(): {i: number, dom: HTMLDivElement}{
+	add(): void{
 		const d: HTMLDivElement = document.createElement("div");
-		d.className = this.name + "obj";
-
 		const dom = this.data.dom;
 		dom.appendChild(d);
-		return {i: dom.childElementCount, dom: d};
-	}
-	add(): void{
-		const {i, dom} = this.appendchild();
-		dom.textContent = "[" + i + "] " + this.sel.dom.options[this.cur].value;
+
+		const i = dom.childElementCount;
+		d.className = this.name + "obj";
+		d.id = d.className + i;
+
+		const obj = new Obj(this.rules[this.cur], d, i);
+		this.obj.push(obj);
 	}
 	nuke(): void{
 		const dom: HTMLElement = this.data.dom;
 		while(dom.hasChildNodes())
 			dom.removeChild(dom.firstChild as ChildNode);
+		this.obj = [];
 	}
 }
 let prim: { [name: string]: Primitive; } = {
