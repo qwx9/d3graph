@@ -1,9 +1,52 @@
+- automatic error checks for data type entry
+
+- set ref if there's children -> children remain, state fucked
+- numeric opts can't reference other values
+- Rule refs are not fixed
+
+- if you add a sym, Rule might be updated, but dom options are not
+- remove obj -> syms/refs/objs aren't renamed (or [i] text)
+	* so if you add two models, remove [1], add another, both will be indexed 2
+- alphabet: add stuff with opts -> can remove -> set to other -> opts remain
+
+
+- error checks, keep track of inconsistencies
+	* thus far, not much to actually do here
+
+- removing elements
+	* need to remove each sym in the element's tree from Rule[]
+- would have to fix all references in our js shit: Rule, Sym
+
+- error area
+- synthesize text file (show it in a text area at end)
+- add text area with result, immediately write resulting config there (just references for now)
+
+- add information to Rule: existing instances of the given Rule (-> Sym[])
+	* in definition: .ref → ref into a ruletab[], and .canalias → list existing instances of THAT Rule (or self)
+	* Rule → will have to allow multiple (exclusive) values: phylogeny: combination of phylogenies or proc+data, etc
+
+- required arguments -> auto add
+
+- file selection and upload
+- sending shit to server
+
+- completely dissociate data from visualisation (dom operations) → set functions for drawing on update
+- start thinking about css and layout (vertical tabs, etc)
+- tooltips for type and description
+- hide unused/uninitialized primitives
+- visual: [primitive type][+] -> hover: desc, click: dropdown menu, select: spawn
+- load ruleset and metadata (descriptions etc) from file or compile multiple ts -> one js
+- or even simple model spec format in root dir -> compile to ts -> compile to js
+
+- submit ready-made bpp config file -> param frontend
+
+
+
 - data types: bool, string, bounded real (]0,1[ etc), proportion, etc.
 - frequency set: must select one (default), can't just dangle
 - implement cross-object references: seq, tree, model, etc.
 	. practically everything can be referenced
 	. but referencing another object is restricted
-- implement cross-object suboptions references and aliasing
 - remove objects
 - add submit -> compile text file and show result
 - error checking: keep track of what's needed: constraints unmet

@@ -3,15 +3,56 @@ function fatal(err: string){
 	throw new Error(err);
 }
 
+function newelement(type: string){
+	const e = document.createElement(type);
+	if(e === null)
+		fatal("newelement: couldn't create new element");
+	return e;
+}
+
+function adddiv(parent: HTMLDivElement){
+	const d = newelement("div") as HTMLDivElement;
+	parent.appendChild(d);
+	return d;
+}
+
+function addlabel(parent: HTMLDivElement, label: string){
+	const lab = newelement("span") as HTMLSpanElement;
+	lab.textContent = label;
+	parent.appendChild(lab);
+}
+
+function addoption(sel: HTMLSelectElement, val: string, disabled: boolean = false, selected: boolean = false){
+	const o = newelement("option") as HTMLOptionElement;
+	o.value = val;
+	o.textContent = val;
+	if(disabled)
+		o.disabled = true;
+	if(selected){
+		o.selected = true;
+		o.defaultSelected = true;
+	}
+	sel.add(o);
+}
+
+function addbutt(parent: HTMLDivElement, label: string, fn: () => void){
+	const but = newelement("button") as HTMLButtonElement;
+	but.textContent = label;
+	but.addEventListener("click", fn);
+	parent.appendChild(but);
+}
+
 class Rule{
 	label: string;
 	sym: string;
 	val: Rule[] | number | null;
+	refs: {[index: string]: Sym};
 
 	constructor(label: string, val: number | Rule[] | null = null, sym?: string){
 		this.label = label;
 		this.sym = sym ? sym : label;
 		this.val = val;
+		this.refs = {};
 	}
 }
 const rules: { [name: string]: Rule[]; } = {
@@ -84,26 +125,26 @@ const rules: { [name: string]: Rule[]; } = {
 		new Rule("F84", [
 			new Rule("kappa", 0.1),
 			new Rule("theta", 0.1),
-			new Rule("theta1", 0.1),
-			new Rule("theta2", 0.1),
+			new Rule("theta1", 0.1, "theta_1"),
+			new Rule("theta2", 0.1, "theta_2"),
 			// FIXME: equilibrium frequencies, everywhere
 		]),
 		new Rule("HKY85", [
 			new Rule("kappa", 0.1),
 			new Rule("theta", 0.1),
-			new Rule("theta1", 0.1),
-			new Rule("theta2", 0.1),
+			new Rule("theta1", 0.1, "theta_1"),
+			new Rule("theta2", 0.1, "theta_2"),
 		]),
 		new Rule("T92", [
 			new Rule("kappa", 0.1),
 			new Rule("theta", 0.1),
 		]),
 		new Rule("TN93", [
-			new Rule("kappa1", 0.1),
-			new Rule("kappa2", 0.1),
+			new Rule("kappa1", 0.1, "kappa_1"),
+			new Rule("kappa2", 0.1, "kappa_2"),
 			new Rule("theta", 0.1),
-			new Rule("theta1", 0.1),
-			new Rule("theta2", 0.1),
+			new Rule("theta1", 0.1, "theta_1"),
+			new Rule("theta2", 0.1, "theta_2"),
 		]),
 		new Rule("testmodel", [
 			new Rule("test", []),
@@ -141,93 +182,158 @@ const rules: { [name: string]: Rule[]; } = {
 	],
 };
 
-class Obj{
+class Sym{
 	readonly rule: Rule;
+	readonly parent: Sym | Primitive;
+	readonly ref: string;
+	obj: Obj | null;
+	vals: {[index: string]: Sym};
+	val1: number | null;
+	
+	constructor(rule: Rule, parent: Sym | Primitive, ref: string, obj: Obj | null){
+		this.rule = rule;
+		this.parent = parent;
+		this.ref = ref + "." + rule.sym;
+		this.obj = obj;
+		this.vals = {};
+		this.val1 = null;
+		rule.refs[this.ref] = this;
+		if(parent instanceof Sym)
+			parent.pushval(this);
+	}
+	has(rule: Rule){
+		return rule.sym in this.vals;
+	}
+	rref(s: string): string{
+		if(this.parent instanceof Primitive)
+			return this.obj!.div.id + "." + s;
+		return (this.parent as Sym).rref(this.rule.sym) + "." + s;
+	}
+	ref_(){
+		return this.rref(this.rule.sym);
+	}
+	pushval(sym: Sym){
+		this.val1 = null;
+		this.vals[sym.rule.sym] = sym;
+	}
+	pop(){
+		delete this.rule.refs[this.ref];
+		this.reset();
+		if(this.obj !== null)
+			this.obj.pop();
+	}
+	reset(){
+		for(let k in this.vals){
+			this.vals[k].pop();
+			delete this.vals[k];
+		}
+		this.val1 = null;
+	}
+	setval1(v: number){
+		this.reset();
+		this.val1 = v;
+	}
+	setvals(i: number, selop: HTMLOptionElement): Sym | null{
+		const rval = this.rule.val as Rule[];
+
+		if(i >= rval.length){
+			this.reset();
+			this.vals["__sym"] = this.rule.refs[selop.textContent as string];
+			return null;
+		}
+		const r = rval[i];
+		if(r.val instanceof Array && r.val.length == 0){
+			this.reset();
+			this.vals["__sym"] = new Sym(r, this, this.ref, null);
+			return null;
+		}
+		if(this.has(r))
+			return null;
+		return new Sym(r, this, this.ref, null);
+	}
+}
+
+class Obj{
+	readonly sym: Sym;
 	readonly div: HTMLDivElement;
 	readonly input: HTMLInputElement | HTMLSelectElement | null;
-	readonly ref: string;
-	readonly idx: number;
-	val: Obj[] | number;
+	readonly parent: HTMLOptionElement | Primitive;
+	obj: Obj[];
 
-	constructor(rule: Rule, div: HTMLDivElement, idx: number, parent: Obj | null = null){
-		this.idx = idx;
-		this.rule = rule;
+	constructor(sym: Sym, div: HTMLDivElement, parent: HTMLOptionElement | Primitive){
+		this.sym = sym
 		this.div = div;
-		this.ref = (parent !== null) ? parent.ref : div.id;
-		this.ref += ":" + rule.label + "_" + idx;
-		const {input:i, val:v} = this.init();
-		this.input = i;
-		this.val = v;
+		this.parent = parent;
+		this.obj = [];
+		sym.obj = this;
+		addbutt(div, "x", () => {
+			this.sym.pop();
+		});
+		this.input = this.init(sym.rule);
 	}
-	init(){
-		const lab: HTMLSpanElement = document.createElement("span");
+	init(rule: Rule): HTMLInputElement | HTMLSelectElement | null{
+		addlabel(this.div, rule.label);
 		let input: HTMLInputElement | HTMLSelectElement;
-		let val: Obj[] | number;
-		lab.textContent = "[" + this.idx + "] " + this.rule.label;
-		this.div.appendChild(lab);
-
-		if(this.rule.val instanceof Array){
-			const r: Rule[] = this.rule.val as Rule[];
+		if(rule.val instanceof Array){
+			const r: Rule[] = rule.val as Rule[];
 			if(r.length === 0)
-				return {input:null, val:-1};
+				return null;
 
-			const sel = document.createElement("select") as HTMLSelectElement;
-			const o = document.createElement("option") as HTMLOptionElement;
-			o.defaultSelected = true;
-			o.selected = true;
-			o.disabled = true;
-			o.text = " -- ";
-			sel.add(o);
+			const sel = newelement("select") as HTMLSelectElement;
+			addoption(sel, " -- ", true, true);
 			r.forEach((v) => {
-				const o = document.createElement("option") as HTMLOptionElement;
-				// FIXME: everywhere? wrap?
-				if(o === null)
-					fatal("obj: couldn't create an option element");
-				o.value = v.label;
-				o.textContent = v.label;
-				sel.add(o);
+				addoption(sel, v.label);
 			});
-			/* fuck this world */
+			let nel = 0;
+			for(let k in rule.refs){
+				if(rule.refs[k].ref === this.sym.ref)
+					continue;
+				nel++;
+				if(nel == 1)
+					addoption(sel, " -- ", true);
+				addoption(sel, rule.refs[k].ref);
+			}
 			sel.addEventListener("input", () => {
 				this.setsel(this);
 			});
 			this.div.appendChild(sel);
 			input = sel;
-			val = [];
 		}else{
-			const num = document.createElement("input") as HTMLInputElement;
+			const num = newelement("input") as HTMLInputElement;
 			num.type = "text";
-			num.value = (this.rule.val as number).toString();
+			num.value = (rule.val as number).toString();
 			num.addEventListener("change", () => {
 				this.setval(this);
 			});
 			this.div.appendChild(num);
 			input = num;
-			val = this.rule.val as number;
 		}
-		return {input:input, val:val};
+		return input;
+	}
+	pop(){
+		this.div.innerHTML = "";
+		this.div.remove();
+		if(this.parent instanceof HTMLOptionElement)
+			(this.parent as HTMLOptionElement).disabled = false;
+		else
+			(this.parent as Primitive).fixindices();
 	}
 	setval(o: Obj){
-		o.val = Number((o.input as HTMLInputElement).value);
-		alert("setval " + o.val + " in " + o.ref);
+		o.sym.val1 = Number((o.input as HTMLInputElement).value);
 	}
 	setsel(o: Obj){
-		const sel = this.input as HTMLSelectElement;
+		const sel = o.input as HTMLSelectElement;
 		const i = sel.selectedIndex - 1;
-		const r = (this.rule.val as Rule[])[i];
 
-		// FIXME: record index or just get from dom later?
-		// FIXME: this allows params with no value not being saved
-		//	but then such params don't make sense
-		if(r.val instanceof Array && r.val.length == 0)
+		const sym = o.sym.setvals(i, sel.selectedOptions[0]);
+		if(sym === null)
 			return;
 
-		const d: HTMLDivElement = document.createElement("div");
-		this.div.appendChild(d);
+		const d = adddiv(o.div);
+		const obj = new Obj(sym, d, sel.selectedOptions[0]);
+		o.obj.push(obj);
 
-		const obj = new Obj(r, d, this.idx, o);
-		(this.val as Obj[]).push(obj);
-
+		sel.selectedOptions[0].disabled = true;
 		sel.selectedIndex = 0;
 	}
 };
@@ -280,7 +386,7 @@ class Primitive{
 		this.obj = [];
 	}
 	private addoption(value: string): HTMLOptionElement{
-		const o: HTMLOptionElement = document.createElement("option");
+		const o = newelement("option") as HTMLOptionElement;
 		if(o === null)
 			fatal("addoption: couldn't create an option element");
 		this.sel.dom.add(o);
@@ -294,26 +400,35 @@ class Primitive{
 		this.cur = i;
 	}
 	add(): void{
-		const d: HTMLDivElement = document.createElement("div");
 		const dom = this.data.dom;
-		dom.appendChild(d);
+		const i = dom.childElementCount + 1;
 
-		const i = dom.childElementCount;
+		const d = adddiv(dom);
+		addlabel(d, "[" + i + "]");
 		d.className = this.name + "obj";
-		d.id = d.className + i;
-
-		const obj = new Obj(this.rules[this.cur], d, i);
+		d.id = this.name + i;
+		const sym = new Sym(this.rules[this.cur], this, this.name + i, null);
+		const obj = new Obj(sym, d, this);
+		alert(sym.ref_());
 		this.obj.push(obj);
 	}
 	setone(i: number){
 		this.setcur(i);
-		// FIXME: better, mutable root obj? not an obj?
 		if(this.obj.length !== 0){
+			this.obj.pop();
 			this.obj = [];
 			this.data.dom.innerHTML = "";
 		}
-		const obj = new Obj(this.rules[this.cur], this.data.dom, 1);
+		const sym = new Sym(this.rules[this.cur], this, this.name + "1", null);
+		const obj = new Obj(sym, this.data.dom, this);
 		this.obj.push(obj);
+	}
+	fixindices(){
+		const c = this.data.dom.children;
+		for(let i=0, j=1; i<c.length; i++, j++){
+			c[i].id = this.name + j;
+			c[i].children[0].textContent = "[" + j + "]";
+		}
 	}
 	nuke(): void{
 		const dom: HTMLElement = this.data.dom;
