@@ -18,4 +18,4 @@ main.ts \
 )
 
 cat ${files[@]} >app.ts
-npx app.ts
+npx tsc app.ts
