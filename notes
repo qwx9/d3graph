@@ -1,3 +1,45 @@
+- finish implementing val.ts
+- skeleton dom.*.ts
+- fix compilation
+- reimplement dom shit as before
+- test
+- file browser for VFileObj
+- submissal
+	* seems fairly simple
+	* mdn: sending forms through javascript
+- references
+	* if a rule marks something as referable, reference a table of such available refs
+	* and whenever a new one is created, add it to the table
+- aliases
+- error checking
+- ruleset generation
+- visuals/css
+- read evolutionary model from file
+
+
+
+- serialization
+	* each expression is compiled into a line of text
+	* process is recursive and now very simple thanks to the data structures
+	* each line is appended to a big string
+	* at the end, the string and files to upload are submitted to the sv in a single request
+- references to objects and aliases
+- error checking: tbd
+	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
+	* or keep state around without recalculating anything, but more bug-prone
+- ruleset generation: tbd
+	* right now, giant object of objects, easy to fuck up
+	* will instead have a file with the simplest possible format
+	* transpiled to typescript, all ts concatenated into app.ts, then transpile to app.js
+- remains
+	* better visuals with css
+	* error checking
+	* ruleset generation
+	* extra stuff
+		. reading ready-made model from input text file
+
+
+
 - automatic error checks for data type entry
 
 - set ref if there's children -> children remain, state fucked
@@ -40,6 +82,31 @@
 
 - submit ready-made bpp config file -> param frontend
 
+- primitive: select add or setone on construction (function pointer), less confusing
+- vis: maybe:
+	add model:
+	model$i = $model() [parms]
+	click [parms] -> <select>
+
+	PRIMLABEL [select][+]
+	[x]model$i = $model(parm[x]) [parms]
+		div
+			span
+				button: [x]
+				span: label: model$i = $model
+				span: (
+					
+				span: )
+				select?: parms
+	compiled sym text decomposed into label (model$i), objname ($model), params[]
+	call this an Expr, not Sym
+	=> primitive contains Expr's
+	expr.compile() → .text + attrs with each component
+		if setting an alias, needs to be multiple lines
+	maybe even dispense with primitives, just have exprs of different types
+		model, optim, alphabet, etc
+	think outside of vis for now, dispense with all the html shit in the index file
+	in fact, we should remove all that shit
 
 
 - data types: bool, string, bounded real (]0,1[ etc), proportion, etc.

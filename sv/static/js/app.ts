@@ -185,31 +185,47 @@ const rules: { [name: string]: Rule[]; } = {
 class Sym{
 	readonly rule: Rule;
 	readonly parent: Sym | Primitive;
-	readonly ref: string;
+	parentid: number | null;	FIXME
 	obj: Obj | null;
 	vals: {[index: string]: Sym};
 	val1: number | null;
 	
-	constructor(rule: Rule, parent: Sym | Primitive, ref: string, obj: Obj | null){
+	constructor(rule: Rule, parent: Sym | Primitive, div: HTMLDivElement | null){
 		this.rule = rule;
 		this.parent = parent;
-		this.ref = ref + "." + rule.sym;
-		this.obj = obj;
 		this.vals = {};
 		this.val1 = null;
-		rule.refs[this.ref] = this;
+		if(div === null)
+			this.obj = null;
+		else{
+			this.obj = new Obj(this, div, 
+
+
+
+
+		if(parent instanceof Primitive){
+		
+		}
+		if(parent instanceof HTMLDivElement){
+			this.obj = new Obj(this, parent as HTMLDivElement, 
+		}else
+			this.obj = null;
+
+
+
+		rule.refs[this.ref()] = this;
 		if(parent instanceof Sym)
 			parent.pushval(this);
 	}
 	has(rule: Rule){
 		return rule.sym in this.vals;
 	}
-	rref(s: string): string{
+	private rref(s: string): string{
 		if(this.parent instanceof Primitive)
 			return this.obj!.div.id + "." + s;
 		return (this.parent as Sym).rref(this.rule.sym) + "." + s;
 	}
-	ref_(){
+	ref(){
 		return this.rref(this.rule.sym);
 	}
 	pushval(sym: Sym){
@@ -217,7 +233,7 @@ class Sym{
 		this.vals[sym.rule.sym] = sym;
 	}
 	pop(){
-		delete this.rule.refs[this.ref];
+		delete this.rule.refs[this.ref()];
 		this.reset();
 		if(this.obj !== null)
 			this.obj.pop();
@@ -244,12 +260,12 @@ class Sym{
 		const r = rval[i];
 		if(r.val instanceof Array && r.val.length == 0){
 			this.reset();
-			this.vals["__sym"] = new Sym(r, this, this.ref, null);
+			this.vals["__sym"] = new Sym(r, this, false, null);
 			return null;
 		}
 		if(this.has(r))
 			return null;
-		return new Sym(r, this, this.ref, null);
+		return new Sym(r, this, null);
 	}
 }
 
@@ -286,12 +302,12 @@ class Obj{
 			});
 			let nel = 0;
 			for(let k in rule.refs){
-				if(rule.refs[k].ref === this.sym.ref)
+				if(rule.refs[k].ref() === this.sym.ref())
 					continue;
 				nel++;
 				if(nel == 1)
 					addoption(sel, " -- ", true);
-				addoption(sel, rule.refs[k].ref);
+				addoption(sel, rule.refs[k].ref());
 			}
 			sel.addEventListener("input", () => {
 				this.setsel(this);
@@ -330,6 +346,7 @@ class Obj{
 			return;
 
 		const d = adddiv(o.div);
+		FIXME:
 		const obj = new Obj(sym, d, sel.selectedOptions[0]);
 		o.obj.push(obj);
 
@@ -369,7 +386,7 @@ class Primitive{
 	readonly data: Datdom;
 	readonly rules: Rule[];
 	readonly curfn: (() => void) | null;
-	obj: Obj[];
+	syms: Sym[];
 	cur: number;
 
 	constructor(tag: string, curfn: (() => void) | null = null){
@@ -383,7 +400,7 @@ class Primitive{
 		this.rules.forEach((v) => {
 			this.addoption(v.label);
 		});
-		this.obj = [];
+		this.sym = [];
 	}
 	private addoption(value: string): HTMLOptionElement{
 		const o = newelement("option") as HTMLOptionElement;
@@ -400,41 +417,57 @@ class Primitive{
 		this.cur = i;
 	}
 	add(): void{
+		const d = adddiv(this.data.dom);
+
+		const sym = new Sym(this.rules[this.cur], this);
+		const obj = sym.putobj();
+			FIXME: should check that obj already exists etc
+		obj.
+
+		FIXME:
+
 		const dom = this.data.dom;
 		const i = dom.childElementCount + 1;
 
 		const d = adddiv(dom);
 		addlabel(d, "[" + i + "]");
 		d.className = this.name + "obj";
-		d.id = this.name + i;
-		const sym = new Sym(this.rules[this.cur], this, this.name + i, null);
+		d.id = this.name + i;	FIXME
+		const sym = new Sym(this.rules[this.cur], this, d);
+		FIXME:
 		const obj = new Obj(sym, d, this);
-		alert(sym.ref_());
 		this.obj.push(obj);
 	}
 	setone(i: number){
+		this.nuke();
 		this.setcur(i);
-		if(this.obj.length !== 0){
-			this.obj.pop();
-			this.obj = [];
-			this.data.dom.innerHTML = "";
-		}
-		const sym = new Sym(this.rules[this.cur], this, this.name + "1", null);
+		const sym = new Sym(this.rules[this.cur], this);
+		this.syms.push(sym);
+
+		FIXME: add obj?
+		FIXME: label
+
+
+		FIXME:
+		// FIXME: no longer setting ref to this.name + "1", check if problem
+		const sym = new Sym(this.rules[this.cur], this, null);
 		const obj = new Obj(sym, this.data.dom, this);
 		this.obj.push(obj);
 	}
 	fixindices(){
-		const c = this.data.dom.children;
-		for(let i=0, j=1; i<c.length; i++, j++){
-			c[i].id = this.name + j;
-			c[i].children[0].textContent = "[" + j + "]";
-		}
+		let i = 1;
+		this.syms.forEach((s) => {
+			s.parentid = i;
+			s.obj.setlabel("[" + i + "] " + s.rule.label);
+			FIXME: s.obj.label.textContent = ...;
+			i++;
+		});
 	}
-	nuke(): void{
-		const dom: HTMLElement = this.data.dom;
-		while(dom.hasChildNodes())
-			dom.removeChild(dom.firstChild as ChildNode);
-		this.obj = [];
+	nuke(){
+		this.syms.forEach((s) => {
+			s.pop();
+		});
+		this.syms = [];
 	}
 }
 let prim: { [name: string]: Primitive; } = {
