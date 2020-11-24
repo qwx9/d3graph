@@ -64,7 +64,7 @@ const rules: { [name: string]: Rule; } = {
 			new Rule("theta1", "theta_1", new RFloat()),
 			new Rule("theta2", "theta_2", new RFloat()),
 		])),
-		new Rule("HKY85", "HKY85", new ROjb([
+		new Rule("HKY85", "HKY85", new RObj([
 			new Rule("kappa", "kappa", new RFloat()),
 			new Rule("theta", "theta", new RFloat()),
 			new Rule("theta1", "theta_1", new RFloat()),
@@ -82,13 +82,19 @@ const rules: { [name: string]: Rule; } = {
 			new Rule("theta2", "theta_2", new RFloat()),
 		]),
 	])),
+	"root": new Rule("root", "root", new RList([
+	])),
+	"rate": new Rule("rate", "rate", new RList([
+	])),
+	"proc": new Rule("proc", "proc", new RList([
+	])),
+	"phyl": new Rule("phyl", "phyl", new RList([
+	])),
 };
 const options: { [name: string]: Option; } = {
 	"alpha": new Option("alpha", () => {
 		prim["seq"].nuke();
 	}),
-	"index1": new Option("index1"),
-	"index2": new Option("index2"),
 	"seq": new Option("seq"),
 	"tree": new Option("tree"),
 	"model": new Option("model"),

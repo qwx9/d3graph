@@ -7,15 +7,15 @@ class Expr{
 	constructor(option: Option, rule: Rule, id: number){
 		this.option = option;
 		this.id = id;
-		this.sym = new Sym(this, rule);
 		this.el = new ExprElem(this);
+		this.sym = new Sym(this, rule);
 	}
 	setid(i: number){
 		this.id = i;
 		el.setid(i);
 	}
 	ref(suff: string): string{
-		return this.option.name;
+		return this.option.name + this.id;
 	}
 	pop(){
 		this.option.pop(this);

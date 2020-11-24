@@ -14,7 +14,7 @@ class Option{
 		this.expr = [];
 		this.set = (this.rule.val instanceof RSelect) ? this.setone : this.push;
 		this.update = update;
-		this.el = new OptionElem(this, curfn);
+		this.el = new OptionElem(this);
 	}
 	push(i: number){
 		if(i >= this.rlist.length)

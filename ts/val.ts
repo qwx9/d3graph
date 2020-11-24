@@ -6,12 +6,11 @@ class VBool{
 	val: bool;
 
 	constructor(r: RBool){
-		this.val = r.default;
+		this.val = this.set(r.default);
 		this.el = new VBoolElem(this);
 	}
-	set(val: bool): bool{
+	set(val: bool){
 		this.val = val;
-		this.el.redraw();
 		return true;
 	}
 	pop(){
@@ -24,14 +23,13 @@ class VInteger{
 	val: number;
 
 	constructor(r: RInteger, sym: Sym){
-		this.val = r.default;
+		this.val = this.set(r.default);
 		this.sym = sym;
 		this.el = new VIntegerElem(this);
 	}
-	set(val: number): bool{
+	set(val: number){
 		this.val = Math.floor(val);
-		this.el.redraw();
-		return true;
+		return r;
 	}
 	pop(){
 		this.el.pop();
@@ -47,11 +45,10 @@ class VPropor{
 		this.sym = sym;
 		this.el = new VProporElem(this);
 	}
-	set(val: number): bool{
-		if(val <= 0 || val >= 1)
+	set(val: number){
+		if(isNaN(val) || val <= 0 || val >= 1)
 			return false;
 		this.val = val;
-		this.el.redraw();
 		return true;
 	}
 	pop(){
@@ -68,9 +65,10 @@ class VFloat{
 		this.sym = sym;
 		this.el = new VFloatElem(this);
 	}
-	set(val: number): bool{
+	set(val: number){
+		if(isNaN(val))
+			return false;
 		this.val = val;
-		this.el.redraw();
 		return true;
 	}
 	pop(){
@@ -87,9 +85,8 @@ class VString{
 		this.sym = sym;
 		this.el = new VStringElem(this);
 	}
-	set(val: string): bool{
+	set(val: string){
 		this.val = val;
-		this.el.redraw();
 		return true;
 	}
 	pop(){
@@ -108,7 +105,7 @@ class VObj{
 		this.parms = {};
 		this.el = new VObjElem(this);
 	}
-	set(sym: Sym, i: number){
+	set(i: number){
 		if(i >= this.robj.rule.length)
 			fatal("this.sym.ref() + ".set: index out of bounds: " + i);
 		const parm = this.robj.rule[i];
@@ -118,7 +115,7 @@ class VObj{
 			delete this.parms[sym];
 		}
 		this.parms[sym] = new Sym(this.sym, parm, this.popchild);
-		this.el.redraw();
+		return true;
 	}
 	pop(){
 		this.parms.forEach((p) => {
@@ -132,8 +129,7 @@ class VObj{
 			fatal("this.sym.ref() + ".pop: no such param " + ssym);
 		this.parms[ssym].pop();
 		delete this.parms[ssym];
-		this.el.redraw();
-	}
+		this.el.popchild(ssym);
 }
 class VFileObj{
 	readonly el: VFileObjElem;
@@ -147,7 +143,7 @@ class VFileObj{
 		this.parms = {};
 		this.el = new VFileObjElem(this);
 	}
-	set(sym: Sym, i: number){
+	set(i: number){
 		if(i >= this.robj.rule.length)
 			fatal("this.sym.ref() + ".set: index out of bounds: " + i);
 		const parm = this.rfobj.rule[i];
@@ -157,7 +153,7 @@ class VFileObj{
 			delete this.parms[sym];
 		}
 		this.parms[sym] = new Sym(this.sym, parm, this.popchild);
-		this.el.redraw();
+		return true;
 	}
 	pop(){
 		this.parms.forEach((p) => {
@@ -170,7 +166,6 @@ class VFileObj{
 		if(!(ssym in this.parms))
 			fatal("this.sym.ref() + ".pop: no such param " + ssym);
 		delete this.parms[ssym];
-		this.el.redraw();
 	}
 }
 class VAlias{

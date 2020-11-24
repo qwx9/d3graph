@@ -10,8 +10,8 @@ class Sym{
 		this.parentpopfn = parentpopfn;
 		this.expr = expr;
 		this.rule = rule;
+		this.el = new SymElem(this);
 		this.val = rule.new(this);
-		this.el = new SymElem(this, expr.el);
 	}
 	ref(suff: string | null = null): string{
 		let r = this.parent.ref(this.rule.sym);
@@ -21,7 +21,6 @@ class Sym{
 	}
 	set(val: number){
 		this.val.set(this, val);
-		this.el.redraw();
 	}
 	pop(){
 		if(this.parentpopfn !== null)

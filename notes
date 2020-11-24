@@ -1,9 +1,7 @@
-- finish implementing val.ts
-- skeleton dom.*.ts
-- fix compilation
-- reimplement dom shit as before
-- test
-- file browser for VFileObj
+- fix compilation, test
+- maybe we don't even need to save any dom state in the dom objects, besides container
+- VString: check if string is admissible/valid
+- VFileObj: input file
 - submissal
 	* seems fairly simple
 	* mdn: sending forms through javascript
@@ -15,6 +13,7 @@
 - ruleset generation
 - visuals/css
 - read evolutionary model from file
+
 
 
 
@@ -38,6 +37,12 @@
 	* extra stuff
 		. reading ready-made model from input text file
 
+
+what we did
+- see commit message
+- interface simplification: dom controls have become completely trivial to write
+	* recursive as well, so parent elements don't care about children implementation
+	* so children can be different depending on data type etc, parent doesn't care
 
 
 - automatic error checks for data type entry

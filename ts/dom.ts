@@ -1,38 +1,83 @@
-function newelement(type: string){
+function newelement(type: string, parent: HTMLDivElement | null = null){
 	const e = document.createElement(type);
 	if(e === null)
 		fatal("newelement: couldn't create new element");
+	if(parent !== null)
+		parent.appendchild(e);
 	return e;
 }
 
 function adddiv(parent: HTMLDivElement){
-	const d = newelement("div") as HTMLDivElement;
-	parent.appendChild(d);
-	return d;
+	const e = newelement("div") as HTMLDivElement;
+	parent.appendChild(e);
+	return e;
 }
 
-function addlabel(parent: HTMLDivElement, label: string){
-	const lab = newelement("span") as HTMLSpanElement;
-	lab.textContent = label;
-	parent.appendChild(lab);
+function addspan(parent: HTMLElement, text: string | null = null){
+	const e = newelement("span") as HTMLSpanElement;
+	if(text !== null)
+		e.textContent = text;
+	parent.appendChild(e);
+	return e;
 }
 
 function addoption(sel: HTMLSelectElement, val: string, disabled: boolean = false, selected: boolean = false){
-	const o = newelement("option") as HTMLOptionElement;
-	o.value = val;
-	o.textContent = val;
+	const e = newelement("option") as HTMLOptionElement;
+	e.value = val;
+	e.textContent = val;
 	if(disabled)
-		o.disabled = true;
+		e.disabled = true;
 	if(selected){
-		o.selected = true;
-		o.defaultSelected = true;
+		e.selected = true;
+		e.defaultSelected = true;
 	}
-	sel.add(o);
+	sel.add(e);
+	return e;
 }
 
-function addbutt(parent: HTMLDivElement, label: string, fn: () => void){
-	const but = newelement("button") as HTMLButtonElement;
-	but.textContent = label;
-	but.addEventListener("click", fn);
-	parent.appendChild(but);
+function addselect(parent: HTMLDivElement, array: Array, attr: string, disable: boolean, action: () => void){
+	const e = newelement("select") as HTMLSelectElement;
+	array.forEach((v) => {
+		addoption(e, v[attr], disable);
+	});
+	if(action !== null)
+		e.addEventListener("change", action);
+	parent.appendChild(e);
+	return e;
+}
+
+function addselectfn(parent: HTMLDivElement, fn: (HTMLSelectElemen) => void, action: () => void){
+	const e = newelement("select") as HTMLSelectElement;
+	fn(e);
+	if(action !== null)
+		e.addEventListener("change", action);
+	parent.appendChild(e);
+	return e;
+}
+
+function addbutton(parent: HTMLDivElement | HTMLSpanElement, label: string, action: () => void){
+	const e = newelement("button") as HTMLButtonElement;
+	e.textContent = label;
+	e.addEventListener("click", action);
+	parent.appendChild(e);
+	return e;
+}
+
+function addcheckbox(parent: HTMLElement, checked: boolean, action: () => void){
+	const e = newelement("input") as HTMLInputElement;
+	e.setAttribute("type", "checkbox");
+	e.checked = checked;
+	e.addEventListener("change", action);
+	parent.appendChild(e);
+	return e;
+}
+
+function addcheckbox(parent: HTMLElement, text: string | null, action: () => void){
+	const e = newelement("input") as HTMLInputElement;
+	e.setAttribute("type", "text");
+	if(text !== null)
+		e.textContent = text;
+	e.addEventListener("change", action);
+	parent.appendChild(e);
+	return e;
 }
