@@ -17,4 +17,5 @@ main.ts \
 )
 
 cat ${files[@]} >app.ts
-npx tsc app.ts 2>&1 | less
+#npx tsc app.ts 2>&1 | less
+npx tsc app.ts

@@ -9,7 +9,7 @@ class BppOptElem{
 	constructor(option: BppOpt){
 		this.option = option;
 		this.div = newelement("div") as HTMLDivElement;
-		document.getElementsByTagName("body")[0].appendChild(this.div);
+		document.getElementById("root").appendChild(this.div);
 		this.label = addspan(this.div, option.name);
 		this.select = addselect(this.div, option.rlist, "label", false, null);
 		option.rlist.forEach((r) => {
