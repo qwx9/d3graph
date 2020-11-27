@@ -1,7 +1,7 @@
 class ExprElem{
 	readonly expr: Expr;
 	readonly div: HTMLDivElement;
-	readonly del: DButton;
+	readonly del: HTMLButtonElement;
 	readonly label: HTMLSpanElement;
 	readonly equals: HTMLSpanElement;
 	readonly value: HTMLSpanElement;

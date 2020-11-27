@@ -1,10 +1,10 @@
 class Expr{
 	readonly el: ExprElem;
-	readonly option: Option;
+	readonly option: BppOpt;
 	id: number;
 	sym: Sym;
 
-	constructor(option: Option, rule: Rule, id: number){
+	constructor(option: BppOpt, rule: Rule, id: number){
 		this.option = option;
 		this.id = id;
 		this.el = new ExprElem(this);
@@ -12,9 +12,10 @@ class Expr{
 	}
 	setid(i: number){
 		this.id = i;
-		el.setid(i);
+		this.el.setid(i);
 	}
-	ref(suff: string): string{
+	ref(suff: string | null = null): string{
+		(suff);
 		return this.option.name + this.id;
 	}
 	pop(){

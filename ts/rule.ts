@@ -1,102 +1,115 @@
-type RType = RSelect | RList | RFileObj | RObj | RString | RFloat | RPropor | RInteger | RBool;
+interface Ruleval{
+	readonly rules?;
+	putval(sym: Sym): Value;
+}
 
-class RBool{
-	readonly default: bool;
+class RBool implements Ruleval{
+	readonly def: boolean;
 
-	constructor(default: bool = false){
-		this.default = default;
+	constructor(def: boolean = false){
+		this.def = def;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VBool(this, sym);
 	}
 }
-class RInteger{
-	readonly default: number;
+class RInteger implements Ruleval{
+	readonly def: number;
 
-	constructor(default: number = 0){
-		this.default = default;
+	constructor(def: number = 0){
+		this.def = def;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VInteger(this, sym);
 	}
 }
-class RPropor{
-	readonly default: number;
+class RPropor implements Ruleval{
+	readonly def: number;
 
-	constructor(default: number = 0){
-		this.default = default;
+	constructor(def: number = 0){
+		this.def = def;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VPropor(this, sym);
 	}
 }
-class RFloat{
-	readonly default: number;
+class RFloat implements Ruleval{
+	readonly def: number;
 
-	constructor(default: number = 0){
-		this.default = default;
+	constructor(def: number = 0){
+		this.def = def;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VFloat(this, sym);
 	}
 }
-class RString{
-	readonly default: string;
+class RString implements Ruleval{
+	readonly def: string;
 
-	constructor(default: string = ""){
-		this.default = default;
+	constructor(def: string = ""){
+		this.def = def;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VString(this, sym);
 	}
 }
-class RObj{
+class RObj implements Ruleval{
 	readonly rules: Rule[];
 
 	constructor(rules: Rule[]){
 		this.rules = rules;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VObj(this, sym);
 	}
 }
-class RFileObj{
+class RFileObj implements Ruleval{
 	readonly rules: Rule[];
 
 	constructor(rules: Rule[]){
 		this.rules = rules;
 	}
-	new(sym: Sym){
+	putval(sym: Sym): Value{
 		return new VFileObj(this, sym);
 	}
 }
-class RList{
+class RList implements Ruleval{
 	readonly rules: Rule[];
 
 	constructor(rules: Rule[]){
 		this.rules = rules;
 	}
+	putval(sym: Sym): Value{
+		(sym)
+		fatal("RList.putval not callable");
+		return null;
+	}
 }
-class RSelect{
+class RSelect implements Ruleval{
 	readonly rules: Rule[];
 
 	constructor(rules: Rule[]){
 		this.rules = rules;
+	}
+	putval(sym: Sym): Value{
+		(sym)
+		fatal("RSelect.putval not callable");
+		return null;
 	}
 }
 class Rule{
-	label: string;
-	sym: string;
-	val: RType | null;
+	readonly label: string;
+	readonly sym: string;
+	readonly val: Ruleval | null;
 
-	constructor(label: string, sym: string, val: RType | null = null){
+	constructor(label: string, sym: string, val: Ruleval | null = null){
 		this.label = label;
 		this.sym = sym;
 		this.val = val;
 	}
-	new(): VType {
+	putval(sym: Sym): Value{
 		if(this.val === null)
 			fatal("rule " + this.label + ": cannot create from null value");
-		return this!.val.new();
+		return this!.val.putval(sym);
 	}
 }

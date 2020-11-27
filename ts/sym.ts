@@ -3,15 +3,14 @@ class Sym{
 	readonly parent: Expr | Sym;
 	readonly rule: Rule;
 	readonly parentpopfn: (Sym) => void;
-	val: VType;
+	val: Value;
 
 	constructor(parent: Expr | Sym, rule: Rule, parentpopfn: (Sym) => void = null){
 		this.parent = parent;
 		this.parentpopfn = parentpopfn;
-		this.expr = expr;
 		this.rule = rule;
 		this.el = new SymElem(this);
-		this.val = rule.new(this);
+		this.val = rule.putval(this);
 	}
 	ref(suff: string | null = null): string{
 		let r = this.parent.ref(this.rule.sym);
@@ -20,7 +19,7 @@ class Sym{
 		return r;
 	}
 	set(val: number){
-		this.val.set(this, val);
+		this.val.set(val);
 	}
 	pop(){
 		if(this.parentpopfn !== null)

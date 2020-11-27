@@ -1,15 +1,20 @@
-type VType = VFileObj | VObj | VString | VFloat | VPropor | VInteger | VBool | VAlias;
+interface Value{
+	readonly sym: Sym;
+	set(val: any): boolean;
+	pop(): void;
+}
 
-class VBool{
+class VBool implements Value{
 	readonly el: VBoolElem;
 	readonly sym: Sym;
-	val: bool;
+	val: boolean;
 
-	constructor(r: RBool){
-		this.val = this.set(r.default);
+	constructor(r: RBool, sym: Sym){
+		(sym);
+		this.set(r.def);
 		this.el = new VBoolElem(this);
 	}
-	set(val: bool){
+	set(val: boolean){
 		this.val = val;
 		return true;
 	}
@@ -17,31 +22,31 @@ class VBool{
 		this.el.pop();
 	}
 }
-class VInteger{
+class VInteger implements Value{
 	readonly el: VIntegerElem;
 	readonly sym: Sym;
 	val: number;
 
 	constructor(r: RInteger, sym: Sym){
-		this.val = this.set(r.default);
+		this.set(r.def);
 		this.sym = sym;
 		this.el = new VIntegerElem(this);
 	}
 	set(val: number){
 		this.val = Math.floor(val);
-		return r;
+		return true;
 	}
 	pop(){
 		this.el.pop();
 	}
 }
-class VPropor{
+class VPropor implements Value{
 	readonly el: VProporElem;
 	readonly sym: Sym;
 	val: number;
 
 	constructor(r: RPropor, sym: Sym){
-		this.val = r.default;
+		this.set(r.def);
 		this.sym = sym;
 		this.el = new VProporElem(this);
 	}
@@ -55,13 +60,13 @@ class VPropor{
 		this.el.pop();
 	}
 }
-class VFloat{
+class VFloat implements Value{
 	readonly el: VFloatElem;
 	readonly sym: Sym;
 	val: number;
 
 	constructor(r: RFloat, sym: Sym){
-		this.val = r.default;
+		this.set(r.def);
 		this.sym = sym;
 		this.el = new VFloatElem(this);
 	}
@@ -75,13 +80,13 @@ class VFloat{
 		this.el.pop();
 	}
 }
-class VString{
+class VString implements Value{
 	readonly el: VStringElem;
 	readonly sym: Sym;
 	val: string;
 
 	constructor(r: RString, sym: Sym){
-		this.val = r.default;
+		this.set(r.def);
 		this.sym = sym;
 		this.el = new VStringElem(this);
 	}
@@ -93,7 +98,7 @@ class VString{
 		this.el.pop();
 	}
 }
-class VObj{
+class VObj implements Value{
 	readonly el: VObjElem;
 	readonly sym: Sym;
 	readonly robj: RObj;
@@ -106,9 +111,9 @@ class VObj{
 		this.el = new VObjElem(this);
 	}
 	set(i: number){
-		if(i >= this.robj.rule.length)
-			fatal("this.sym.ref() + ".set: index out of bounds: " + i);
-		const parm = this.robj.rule[i];
+		if(i >= this.robj.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		const parm = this.robj.rules[i];
 		const sym = parm.sym;
 		if(sym in this.parms){
 			this.parms[sym].pop();
@@ -118,20 +123,21 @@ class VObj{
 		return true;
 	}
 	pop(){
-		this.parms.forEach((p) => {
-			p.pop();
-		});
+		for(let k in this.parms){
+			this.parms[k].pop();
+		}
 		this.el.pop();
 	}
-	function popchild(sym: Sym){
+	popchild(sym: Sym){
 		const ssym = sym.rule.sym;
 		if(!(ssym in this.parms))
-			fatal("this.sym.ref() + ".pop: no such param " + ssym);
+			fatal(this.sym.ref() + ".pop: no such param " + ssym);
 		this.parms[ssym].pop();
 		delete this.parms[ssym];
 		this.el.popchild(ssym);
+	}
 }
-class VFileObj{
+class VFileObj implements Value{
 	readonly el: VFileObjElem;
 	readonly sym: Sym;
 	readonly rfobj: RFileObj;
@@ -144,9 +150,9 @@ class VFileObj{
 		this.el = new VFileObjElem(this);
 	}
 	set(i: number){
-		if(i >= this.robj.rule.length)
-			fatal("this.sym.ref() + ".set: index out of bounds: " + i);
-		const parm = this.rfobj.rule[i];
+		if(i >= this.rfobj.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		const parm = this.rfobj.rules[i];
 		const sym = parm.sym;
 		if(sym in this.parms){
 			this.parms[sym].pop();
@@ -156,33 +162,19 @@ class VFileObj{
 		return true;
 	}
 	pop(){
-		this.parms.forEach((p) => {
-			p.pop();
-		});
+		for(let k in this.parms){
+			this.parms[k].pop();
+		}
 		this.el.pop();
 	}
-	function popchild(sym: Sym){
+	popchild(sym: Sym){
 		const ssym = sym.rule.sym;
 		if(!(ssym in this.parms))
-			fatal("this.sym.ref() + ".pop: no such param " + ssym);
+			fatal(this.sym.ref() + ".pop: no such param " + ssym);
 		delete this.parms[ssym];
 	}
 }
-class VAlias{
 /*
-	readonly el: VAliasElem;
-	readonly sym: Sym;
-
-	constructor(..., sym: Sym){
-		...
-		this.sym = sym;
-		this.el = new VAliasElem(this);
-	}
-	set(){
-		...
-	}
-	pop(){
-		...
-	}
-*/
+class VAlias implements Value{
 }
+*/

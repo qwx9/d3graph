@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 files=(\
 dom.expr.ts \
@@ -17,4 +17,4 @@ main.ts \
 )
 
 cat ${files[@]} >app.ts
-npx tsc app.ts
+npx tsc app.ts 2>&1 | less

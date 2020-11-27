@@ -3,7 +3,7 @@ function newelement(type: string, parent: HTMLDivElement | null = null){
 	if(e === null)
 		fatal("newelement: couldn't create new element");
 	if(parent !== null)
-		parent.appendchild(e);
+		parent.appendChild(e);
 	return e;
 }
 
@@ -35,7 +35,7 @@ function addoption(sel: HTMLSelectElement, val: string, disabled: boolean = fals
 	return e;
 }
 
-function addselect(parent: HTMLDivElement, array: Array, attr: string, disable: boolean, action: () => void){
+function addselect(parent: HTMLDivElement, array: any[], attr: string, disable: boolean, action: () => void){
 	const e = newelement("select") as HTMLSelectElement;
 	array.forEach((v) => {
 		addoption(e, v[attr], disable);
@@ -46,7 +46,7 @@ function addselect(parent: HTMLDivElement, array: Array, attr: string, disable: 
 	return e;
 }
 
-function addselectfn(parent: HTMLDivElement, fn: (HTMLSelectElemen) => void, action: () => void){
+function addselectfn(parent: HTMLElement, fn: (HTMLSelectElemen) => void, action: () => void){
 	const e = newelement("select") as HTMLSelectElement;
 	fn(e);
 	if(action !== null)
@@ -72,7 +72,7 @@ function addcheckbox(parent: HTMLElement, checked: boolean, action: () => void){
 	return e;
 }
 
-function addcheckbox(parent: HTMLElement, text: string | null, action: () => void){
+function addtext(parent: HTMLElement, text: string | null, action: () => void){
 	const e = newelement("input") as HTMLInputElement;
 	e.setAttribute("type", "text");
 	if(text !== null)

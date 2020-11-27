@@ -1,5 +1,5 @@
-class Option{
-	readonly el: OptionElem;
+class BppOpt{
+	readonly el: BppOptElem;
 	readonly name: string;
 	readonly rule: Rule;
 	readonly rlist: Rule[];
@@ -10,11 +10,11 @@ class Option{
 	constructor(name: string, update: (() => void) | null = null){
 		this.name = name;
 		this.rule = rules[name];
-		this.rlist = rules[name].val.rules;
+		this.rlist = (rules[name].val as RSelect | RList).rules;
 		this.expr = [];
 		this.set = (this.rule.val instanceof RSelect) ? this.setone : this.push;
 		this.update = update;
-		this.el = new OptionElem(this);
+		this.el = new BppOptElem(this);
 	}
 	push(i: number){
 		if(i >= this.rlist.length)

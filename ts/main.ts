@@ -42,16 +42,16 @@ const rules: { [name: string]: Rule; } = {
 			])),
 		])),
 		new Rule("Clustal", "Clustal", new RFileObj([
-			new Rule("extraSpaces", "extraSpaces", RBool()),
+			new Rule("extraSpaces", "extraSpaces", new RBool()),
 		])),
-		new Rule("Dcse", "Dcse", new RFileObj()),
-		new Rule("Nexus", "Nexus", new RFileObj()),
-		new Rule("Genbank", "Genbank", new RFileObj()),
+		new Rule("Dcse", "Dcse", new RFileObj([])),
+		new Rule("Nexus", "Nexus", new RFileObj([])),
+		new Rule("Genbank", "Genbank", new RFileObj([])),
 	])),
 	"tree": new Rule("tree", "tree", new RList([
-		new Rule("Newick", "Newick", RFileObj()),
-		new Rule("Nexus", "Nexus", new RFileObj()),
-		new Rule("NHX", "NHX", new RFileObj()),
+		new Rule("Newick", "Newick", new RFileObj([])),
+		new Rule("Nexus", "Nexus", new RFileObj([])),
+		new Rule("NHX", "NHX", new RFileObj([])),
 	])),
 	"model": new Rule("model", "model", new RList([
 		new Rule("JC69", "JC69", new RObj([])),
@@ -80,7 +80,7 @@ const rules: { [name: string]: Rule; } = {
 			new Rule("theta", "theta", new RFloat()),
 			new Rule("theta1", "theta_1", new RFloat()),
 			new Rule("theta2", "theta_2", new RFloat()),
-		]),
+		])),
 	])),
 	"root": new Rule("root", "root", new RList([
 	])),
@@ -91,15 +91,15 @@ const rules: { [name: string]: Rule; } = {
 	"phyl": new Rule("phyl", "phyl", new RList([
 	])),
 };
-const options: { [name: string]: Option; } = {
-	"alpha": new Option("alpha", () => {
-		prim["seq"].nuke();
+const options: { [name: string]: BppOpt; } = {
+	"alpha": new BppOpt("alpha", () => {
+		options["seq"].nuke();
 	}),
-	"seq": new Option("seq"),
-	"tree": new Option("tree"),
-	"model": new Option("model"),
-	"root": new Option("root"),
-	"rate": new Option("rate"),
-	"proc": new Option("proc"),
-	"phyl": new Option("phyl"),
+	"seq": new BppOpt("seq"),
+	"tree": new BppOpt("tree"),
+	"model": new BppOpt("model"),
+	"root": new BppOpt("root"),
+	"rate": new BppOpt("rate"),
+	"proc": new BppOpt("proc"),
+	"phyl": new BppOpt("phyl"),
 };
