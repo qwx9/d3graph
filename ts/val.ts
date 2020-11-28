@@ -1,6 +1,7 @@
 interface Value{
 	readonly sym: Sym;
 	set(val: any): boolean;
+	compile(): string;
 	pop(): void;
 }
 
@@ -17,6 +18,9 @@ class VBool implements Value{
 	set(val: boolean){
 		this.val = val;
 		return true;
+	}
+	compile(){
+		return "=" + this.val.toString();
 	}
 	pop(){
 		this.el.pop();
@@ -35,6 +39,9 @@ class VInteger implements Value{
 	set(val: number){
 		this.val = Math.floor(val);
 		return true;
+	}
+	compile(){
+		return "=" + this.val.toString();
 	}
 	pop(){
 		this.el.pop();
@@ -56,6 +63,9 @@ class VPropor implements Value{
 		this.val = val;
 		return true;
 	}
+	compile(){
+		return "=" + this.val.toString();
+	}
 	pop(){
 		this.el.pop();
 	}
@@ -76,6 +86,9 @@ class VFloat implements Value{
 		this.val = val;
 		return true;
 	}
+	compile(){
+		return "=" + this.val.toString();
+	}
 	pop(){
 		this.el.pop();
 	}
@@ -93,6 +106,9 @@ class VString implements Value{
 	set(val: string){
 		this.val = val;
 		return true;
+	}
+	compile(){
+		return "=" + this.val;
 	}
 	pop(){
 		this.el.pop();
@@ -115,12 +131,22 @@ class VObj implements Value{
 			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
 		const parm = this.robj.rules[i];
 		const sym = parm.sym;
-		if(sym in this.parms){
+		if(this.parms.hasOwnProperty(sym)){
 			this.parms[sym].pop();
 			delete this.parms[sym];
 		}
-		this.parms[sym] = new Sym(this.sym, parm, this.popchild);
+		this.parms[sym] = new Sym(this.sym, parm, this);
 		return true;
+	}
+	compile(){
+		let s = "(";
+		const k = Object.keys(this.parms);
+		for(let i = 0; i<k.length; i++){
+			s += this.parms[k[i]].compile();
+			if(i < k.length - 1)
+				s += ", ";
+		}
+		return s + ")";
 	}
 	pop(){
 		for(let k in this.parms){
@@ -130,9 +156,8 @@ class VObj implements Value{
 	}
 	popchild(sym: Sym){
 		const ssym = sym.rule.sym;
-		if(!(ssym in this.parms))
+		if(!this.parms.hasOwnProperty(ssym))
 			fatal(this.sym.ref() + ".pop: no such param " + ssym);
-		this.parms[ssym].pop();
 		delete this.parms[ssym];
 		this.el.popchild(ssym);
 	}
@@ -154,12 +179,22 @@ class VFileObj implements Value{
 			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
 		const parm = this.rfobj.rules[i];
 		const sym = parm.sym;
-		if(sym in this.parms){
+		if(this.parms.hasOwnProperty(sym)){
 			this.parms[sym].pop();
 			delete this.parms[sym];
 		}
-		this.parms[sym] = new Sym(this.sym, parm, this.popchild);
+		this.parms[sym] = new Sym(this.sym, parm, this);
 		return true;
+	}
+	compile(){
+		let s = "(";
+		const k = Object.keys(this.parms);
+		for(let i = 0; i<k.length; i++){
+			s += this.parms[k[i]].compile();
+			if(i < k.length - 1)
+				s += ", ";
+		}
+		return s + ")";
 	}
 	pop(){
 		for(let k in this.parms){
@@ -169,7 +204,8 @@ class VFileObj implements Value{
 	}
 	popchild(sym: Sym){
 		const ssym = sym.rule.sym;
-		if(!(ssym in this.parms))
+		this.el.popchild(ssym);
+		if(!this.parms.hasOwnProperty(ssym))
 			fatal(this.sym.ref() + ".pop: no such param " + ssym);
 		delete this.parms[ssym];
 	}

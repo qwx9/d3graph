@@ -21,6 +21,18 @@ function addspan(parent: HTMLElement, text: string | null = null){
 	return e;
 }
 
+function addbr(parent: HTMLElement){
+	parent.appendChild(newelement("br"));
+}
+
+function addspanbeforelast(parent: HTMLElement, text: string | null = null){
+	const e = newelement("span") as HTMLSpanElement;
+	if(text !== null)
+		e.textContent = text;
+	parent.insertBefore(e, parent.children[parent.childElementCount-1]);
+	return e;
+}
+
 function addoption(sel: HTMLSelectElement, val: string, disabled: boolean = false, selected: boolean = false){
 	const e = newelement("option") as HTMLOptionElement;
 	e.value = val;

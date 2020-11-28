@@ -4,21 +4,21 @@ class SymElem{
 	readonly span: HTMLSpanElement;
 	readonly label: HTMLSpanElement;
 	readonly value: HTMLSpanElement;
-	readonly del: HTMLButtonElement;
 
 	constructor(sym: Sym){
 		this.sym = sym;
-		this.isobj = sym.val instanceof RObj || sym.val instanceof RFileObj;
-		this.span = addspan(sym.parent.el.value, "span");
+		this.isobj = sym.rule.val instanceof RObj || sym.rule.val instanceof RFileObj;
+		this.span = addspan(sym.parent.el.value, null);
 		this.label = addspan(this.span, sym.rule.sym);
 		if(this.isobj)
 			addspan(this.span, "(");
 		this.value = addspan(this.span);
 		if(this.isobj)
 			addspan(this.span, ")");
-		this.del = addbutton(this.span, "x", () => {
-			this.sym.pop();
-		});
+		if(!(sym.parent instanceof Expr))
+			addbutton(this.span, "x", () => {
+				this.sym.pop();
+			});
 	}
 	pop(){
 		this.span.remove();

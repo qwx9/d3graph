@@ -12,14 +12,13 @@ class BppOptElem{
 		document.getElementById("root").appendChild(this.div);
 		this.label = addspan(this.div, option.name);
 		this.select = addselect(this.div, option.rlist, "label", false, null);
-		option.rlist.forEach((r) => {
-			addoption(this.select, r.label);
-		});
-		this.select.options[0].selected = true;
-		this.select.options[0].defaultSelected = true;
-		this.add = addbutton(this.div, "+", () => {
-			this.push();
-		});
+		if(option.rlist.length > 0){
+			this.select.options[0].selected = true;
+			this.select.options[0].defaultSelected = true;
+			this.add = addbutton(this.div, "+", () => {
+				this.push();
+			});
+		}
 		this.datdiv = adddiv(this.div);
 		this.div.appendChild(newelement("br"));
 	}

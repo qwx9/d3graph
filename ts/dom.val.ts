@@ -4,10 +4,10 @@ class VBoolElem{
 	readonly check: HTMLInputElement;
 	val: VBool;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VBool;
+	constructor(val: VBool){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
+		this.span = addspan(val.sym.el.value);
 		this.check = addcheckbox(this.span, this.val.val, () => {
 			this.val.set(this.check.checked);
 		});
@@ -22,10 +22,10 @@ class VIntegerElem{
 	readonly text: HTMLInputElement;
 	val: VInteger;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VInteger;
+	constructor(val: VInteger){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
+		this.span = addspan(val.sym.el.value);
 		this.text = addtext(this.span, this.val.val.toString(), () => {
 			if(this.val.set(parseInt(this.text.value)))
 				this.text.value = this.val.val.toString();
@@ -41,10 +41,10 @@ class VProporElem{
 	readonly text: HTMLInputElement;
 	val: VPropor;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VPropor;
+	constructor(val: VPropor){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
+		this.span = addspan(val.sym.el.value);
 		this.text = addtext(this.span, this.val.val.toString(), () => {
 			if(this.val.set(parseFloat(this.text.value)))
 				this.text.value = this.val.val.toString();
@@ -60,10 +60,10 @@ class VFloatElem{
 	readonly text: HTMLInputElement;
 	val: VFloat;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VFloat;
+	constructor(val: VFloat){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
+		this.span = addspan(val.sym.el.value);
 		this.text = addtext(this.span, this.val.val.toString(), () => {
 			if(this.val.set(parseFloat(this.text.value)))
 				this.text.value = this.val.val.toString();
@@ -79,10 +79,10 @@ class VStringElem{
 	readonly text: HTMLInputElement;
 	val: VString;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VString;
+	constructor(val: VString){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
+		this.span = addspan(val.sym.el.value);
 		this.text = addtext(this.span, this.val.val.toString(), () => {
 			if(this.val.set(this.text.value))
 				this.text.value = this.val.val;
@@ -96,31 +96,43 @@ class VObjElem{
 	readonly sym: Sym;
 	readonly span: HTMLSpanElement;
 	readonly select: HTMLSelectElement;
-	commas: { [name: string]: HTMLSpanElement; };
+	parms: { [name: string]: HTMLOptionElement; };
 	val: VObj;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VObj;
+	constructor(val: VObj){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
-		this.commas = {};
-		this.select = addselectfn(this.span, (e) => {
-			addoption(e, " -- ", true, true);
-			for(let k in this.val.parms)
-				addoption(e, this.val.parms[k].rule.sym);
-		}, () => {
-			if(this.val.set(this.select.selectedIndex - 1)){
-				this.select.options[0].disabled = true;
-				this.select.selectedIndex = 0;
-			}
-			if(Object.keys(this.val.parms).length > 1)
-				this.commas[this.sym.rule.sym] = addspan(this.span, ", ");
-		});
+		this.span = addspan(val.sym.el.value);
+		this.parms = {};
+		if(val.robj.rules.length > 0){
+			this.select = addselectfn(this.span, (e) => {
+				addoption(e, " -- ", true, true);
+				this.val.robj.rules.forEach((r) => {
+					addoption(e, r.sym);
+				});
+			}, () => {
+				const i = this.select.selectedIndex;
+				if(this.val.set(i - 1)){
+					this.select.options[i].disabled = true;
+					this.select.selectedIndex = 0;
+					if(Object.keys(this.val.parms).length > 1)
+						addspanbeforelast(val.sym.el.value, ", ");
+					this.parms[this.val.robj.rules[i - 1].sym] = this.select.options[i];
+				}
+			});
+		}
 	}
 	popchild(ref: string){
-		if(ref in this.commas){
-			this.commas[ref].remove();
-			delete this.commas[ref];
+		if(this.parms.hasOwnProperty(ref)){
+			this.parms[ref].disabled = false;
+			const spar = this.val.sym.el.value;
+			let s = spar.children[spar.childElementCount-1];
+			if(s.textContent === ", ")
+				s.remove();
+			s = spar.children[0];
+			if(s.textContent === ", ")
+				s.remove();
+			delete this.parms[ref];
 		}
 	}
 	pop(){
@@ -131,31 +143,43 @@ class VFileObjElem{
 	readonly sym: Sym;
 	readonly span: HTMLSpanElement;
 	readonly select: HTMLSelectElement;
-	commas: { [name: string]: HTMLSpanElement; };
-	val: VObj;
+	parms: { [name: string]: HTMLOptionElement; };
+	val: VFileObj;
 
-	constructor(val: Value){
-		this.val = val.sym.val as VObj;
+	constructor(val: VFileObj){
+		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value, "span");
-		this.commas = {};
-		this.select = addselectfn(this.span, (e) => {
-			addoption(e, " -- ", true, true);
-			for(let k in this.val.parms)
-				addoption(e, this.val.parms[k].rule.sym);
-		}, () => {
-			if(this.val.set(this.select.selectedIndex - 1)){
-				this.select.options[0].disabled = true;
-				this.select.selectedIndex = 0;
-			}
-			if(Object.keys(this.val.parms).length > 1)
-				this.commas[this.sym.rule.sym] = addspan(this.span, ", ");
-		});
+		this.span = addspan(val.sym.el.value);
+		this.parms = {};
+		if(val.rfobj.rules.length > 0){
+			this.select = addselectfn(this.span, (e) => {
+				addoption(e, " -- ", true, true);
+				this.val.rfobj.rules.forEach((r) => {
+					addoption(e, r.sym);
+				});
+			}, () => {
+				const i = this.select.selectedIndex;
+				if(this.val.set(i - 1)){
+					this.select.options[i].disabled = true;
+					this.select.selectedIndex = 0;
+					if(Object.keys(this.val.parms).length > 1)
+						addspanbeforelast(val.sym.el.value, ", ");
+					this.parms[this.val.rfobj.rules[i - 1].sym] = this.select.options[i];
+				}
+			});
+		}
 	}
 	popchild(ref: string){
-		if(ref in this.commas){
-			this.commas[ref].remove();
-			delete this.commas[ref];
+		if(this.parms.hasOwnProperty(ref)){
+			this.parms[ref].disabled = false;
+			const spar = this.val.sym.el.value;
+			let s = spar.children[spar.childElementCount-1];
+			if(s.textContent === ", ")
+				s.remove();
+			s = spar.children[0];
+			if(s.textContent === ", ")
+				s.remove();
+			delete this.parms[ref];
 		}
 	}
 	pop(){

@@ -1,13 +1,13 @@
 class Sym{
 	readonly el: SymElem;
 	readonly parent: Expr | Sym;
+	readonly parentval: VObj | VFileObj | null;
 	readonly rule: Rule;
-	readonly parentpopfn: (Sym) => void;
 	val: Value;
 
-	constructor(parent: Expr | Sym, rule: Rule, parentpopfn: (Sym) => void = null){
+	constructor(parent: Expr | Sym, rule: Rule, parentval: VObj | VFileObj | null = null){
 		this.parent = parent;
-		this.parentpopfn = parentpopfn;
+		this.parentval = parentval;
 		this.rule = rule;
 		this.el = new SymElem(this);
 		this.val = rule.putval(this);
@@ -21,9 +21,12 @@ class Sym{
 	set(val: number){
 		this.val.set(val);
 	}
+	compile(): string{
+		return this.rule.sym + this.val.compile();
+	}
 	pop(){
-		if(this.parentpopfn !== null)
-			this.parentpopfn(this);
+		if(this.parentval !== null)
+			this.parentval.popchild(this);
 		this.val.pop();
 		this.el.pop();
 	}

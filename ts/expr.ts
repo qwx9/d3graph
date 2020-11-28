@@ -18,6 +18,9 @@ class Expr{
 		(suff);
 		return this.option.name + this.id;
 	}
+	compile(): string{
+		return this.ref() + " = " + this.sym.compile();
+	}
 	pop(){
 		this.option.pop(this);
 		this.el.pop();

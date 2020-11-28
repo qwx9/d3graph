@@ -28,6 +28,13 @@ class BppOpt{
 		this.nuke();
 		this.push(i);
 	}
+	compile(){
+		let s = [];
+		this.expr.forEach((e) => {
+			s.push(e.compile());
+		});
+		return s;
+	}
 	nuke(){
 		this.expr.forEach((e) => {
 			e.pop();

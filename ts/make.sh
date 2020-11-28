@@ -1,14 +1,16 @@
 #!/bin/bash
 
 files=(\
+fns.ts \
 dom.expr.ts \
 dom.option.ts \
+dom.parse.ts \
 dom.sym.ts \
 dom.val.ts \
 dom.ts \
 expr.ts \
-fns.ts \
 option.ts \
+parse.ts \
 rule.ts \
 sym.ts \
 val.ts \

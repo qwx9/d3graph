@@ -103,3 +103,5 @@ const options: { [name: string]: BppOpt; } = {
 	"proc": new BppOpt("proc"),
 	"phyl": new BppOpt("phyl"),
 };
+
+registersubmit();
