@@ -1,10 +1,9 @@
 class BppOptElem{
 	readonly option: BppOpt;
 	readonly div: HTMLDivElement;
-	readonly datdiv: HTMLDivElement;
+	readonly value: HTMLDivElement;
 	readonly label: HTMLSpanElement;
 	readonly select: HTMLSelectElement;
-	readonly add: HTMLButtonElement;
 
 	constructor(option: BppOpt){
 		this.option = option;
@@ -15,14 +14,21 @@ class BppOptElem{
 		if(option.rlist.length > 0){
 			this.select.options[0].selected = true;
 			this.select.options[0].defaultSelected = true;
-			this.add = addbutton(this.div, "+", () => {
-				this.push();
-			});
+			if(option.rule.val instanceof RSelect)
+				addbutton(this.div, "set", () => {
+					this.set();
+				});
+			else
+				addbutton(this.div, "+", () => {
+					this.push();
+				});
 		}
-		this.datdiv = adddiv(this.div);
-		this.div.appendChild(newelement("br"));
+		this.value = adddiv(this.div);
 	}
 	push(){
+		this.option.push(this.select.selectedIndex);
+	}
+	set(){
 		this.option.set(this.select.selectedIndex);
 	}
 }

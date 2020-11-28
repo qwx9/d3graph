@@ -3,16 +3,14 @@ class BppOpt{
 	readonly name: string;
 	readonly rule: Rule;
 	readonly rlist: Rule[];
-	readonly set: (number) => void;
 	readonly update: () => void | null;
 	expr: Expr[];
 
 	constructor(name: string, update: (() => void) | null = null){
 		this.name = name;
 		this.rule = rules[name];
-		this.rlist = (rules[name].val as RSelect | RList).rules;
+		this.rlist = this.rule.val.rules;
 		this.expr = [];
-		this.set = (this.rule.val instanceof RSelect) ? this.setone : this.push;
 		this.update = update;
 		this.el = new BppOptElem(this);
 	}
@@ -24,7 +22,7 @@ class BppOpt{
 		const e = new Expr(this, this.rlist[i], this.expr.length + 1);
 		this.expr.push(e);
 	}
-	setone(i: number){
+	set(i: number){
 		this.nuke();
 		this.push(i);
 	}

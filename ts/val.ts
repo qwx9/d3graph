@@ -114,29 +114,17 @@ class VString implements Value{
 		this.el.pop();
 	}
 }
-class VObj implements Value{
-	readonly el: VObjElem;
+
+abstract class VMulti implements Value{
+	readonly el: VMultiElem;
 	readonly sym: Sym;
-	readonly robj: RObj;
+	readonly rules: Rule[];
 	parms: { [name: string]: Sym; };
 
-	constructor(r: RObj, sym: Sym){
+	constructor(r: Ruleval, sym: Sym){
 		this.sym = sym;
-		this.robj = (sym.rule.val as RObj);
+		this.rules = r.rules;
 		this.parms = {};
-		this.el = new VObjElem(this);
-	}
-	set(i: number){
-		if(i >= this.robj.rules.length)
-			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
-		const parm = this.robj.rules[i];
-		const sym = parm.sym;
-		if(this.parms.hasOwnProperty(sym)){
-			this.parms[sym].pop();
-			delete this.parms[sym];
-		}
-		this.parms[sym] = new Sym(this.sym, parm, this);
-		return true;
 	}
 	compile(){
 		let s = "(";
@@ -148,10 +136,24 @@ class VObj implements Value{
 		}
 		return s + ")";
 	}
-	pop(){
-		for(let k in this.parms){
-			this.parms[k].pop();
+	set(i: number){
+		if(i >= this.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		const parm = this.rules[i];
+		const sym = parm.sym;
+		if(this.parms.hasOwnProperty(sym)){
+			this.parms[sym].pop();
+			delete this.parms[sym];
 		}
+		this.parms[sym] = new Sym(this.sym, parm, this);
+		return true;
+	}
+	nuke(){
+		for(let k in this.parms)
+			this.parms[k].pop();
+	}
+	pop(){
+		this.nuke();
 		this.el.pop();
 	}
 	popchild(sym: Sym){
@@ -162,52 +164,32 @@ class VObj implements Value{
 		this.el.popchild(ssym);
 	}
 }
-class VFileObj implements Value{
+class VObj extends VMulti{
+	readonly el: VObjElem;
+
+	constructor(r: RObj, sym: Sym){
+		super(r, sym);
+		this.el = new VObjElem(this);
+	}
+}
+class VFileObj extends VMulti{
 	readonly el: VFileObjElem;
-	readonly sym: Sym;
-	readonly rfobj: RFileObj;
-	parms: { [name: string]: Sym; };
 
 	constructor(r: RFileObj, sym: Sym){
-		this.sym = sym;
-		this.rfobj = (sym.rule.val as RFileObj);
-		this.parms = {};
+		super(r, sym);
 		this.el = new VFileObjElem(this);
 	}
+}
+class VSelect extends VMulti{
+	readonly el: VSelectElem;
+
+	constructor(r: RSelect, sym: Sym){
+		super(r, sym);
+		this.el = new VSelectElem(this);
+	}
 	set(i: number){
-		if(i >= this.rfobj.rules.length)
-			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
-		const parm = this.rfobj.rules[i];
-		const sym = parm.sym;
-		if(this.parms.hasOwnProperty(sym)){
-			this.parms[sym].pop();
-			delete this.parms[sym];
-		}
-		this.parms[sym] = new Sym(this.sym, parm, this);
-		return true;
-	}
-	compile(){
-		let s = "(";
-		const k = Object.keys(this.parms);
-		for(let i = 0; i<k.length; i++){
-			s += this.parms[k[i]].compile();
-			if(i < k.length - 1)
-				s += ", ";
-		}
-		return s + ")";
-	}
-	pop(){
-		for(let k in this.parms){
-			this.parms[k].pop();
-		}
-		this.el.pop();
-	}
-	popchild(sym: Sym){
-		const ssym = sym.rule.sym;
-		this.el.popchild(ssym);
-		if(!this.parms.hasOwnProperty(ssym))
-			fatal(this.sym.ref() + ".pop: no such param " + ssym);
-		delete this.parms[ssym];
+		this.nuke();
+		return super.set(i);
 	}
 }
 /*

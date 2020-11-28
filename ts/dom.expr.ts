@@ -8,7 +8,7 @@ class ExprElem{
 
 	constructor(expr: Expr){
 		this.expr = expr;
-		this.div = adddiv(expr.option.el.datdiv);
+		this.div = adddiv(expr.option.el.value);
 		this.del = addbutton(this.div, "x", () => {
 			this.expr.pop();
 		});

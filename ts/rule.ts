@@ -73,18 +73,6 @@ class RFileObj implements Ruleval{
 		return new VFileObj(this, sym);
 	}
 }
-class RList implements Ruleval{
-	readonly rules: Rule[];
-
-	constructor(rules: Rule[]){
-		this.rules = rules;
-	}
-	putval(sym: Sym): Value{
-		(sym)
-		fatal("RList.putval not callable");
-		return null;
-	}
-}
 class RSelect implements Ruleval{
 	readonly rules: Rule[];
 
@@ -92,9 +80,7 @@ class RSelect implements Ruleval{
 		this.rules = rules;
 	}
 	putval(sym: Sym): Value{
-		(sym)
-		fatal("RSelect.putval not callable");
-		return null;
+		return new VSelect(this, sym);
 	}
 }
 class Rule{

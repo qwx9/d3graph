@@ -19,7 +19,7 @@ const rules: { [name: string]: Rule; } = {
 			])),
 		])),
 	])),
-	"seq": new Rule("seq", "seq", new RList([
+	"seq": new Rule("seq", "seq", new RObj([
 		new Rule("Fasta", "Fasta", new RObj([
 			new Rule("extended", "extended", new RBool()),
 			new Rule("strictNames", "strictNames", new RBool()),
@@ -48,12 +48,12 @@ const rules: { [name: string]: Rule; } = {
 		new Rule("Nexus", "Nexus", new RFileObj([])),
 		new Rule("Genbank", "Genbank", new RFileObj([])),
 	])),
-	"tree": new Rule("tree", "tree", new RList([
+	"tree": new Rule("tree", "tree", new RObj([
 		new Rule("Newick", "Newick", new RFileObj([])),
 		new Rule("Nexus", "Nexus", new RFileObj([])),
 		new Rule("NHX", "NHX", new RFileObj([])),
 	])),
-	"model": new Rule("model", "model", new RList([
+	"model": new Rule("model", "model", new RObj([
 		new Rule("JC69", "JC69", new RObj([])),
 		new Rule("K80", "K80", new RObj([
 			new Rule("kappa", "kappa", new RFloat()),
@@ -82,13 +82,13 @@ const rules: { [name: string]: Rule; } = {
 			new Rule("theta2", "theta_2", new RFloat()),
 		])),
 	])),
-	"root": new Rule("root", "root", new RList([
+	"root": new Rule("root", "root", new RObj([
 	])),
-	"rate": new Rule("rate", "rate", new RList([
+	"rate": new Rule("rate", "rate", new RObj([
 	])),
-	"proc": new Rule("proc", "proc", new RList([
+	"proc": new Rule("proc", "proc", new RObj([
 	])),
-	"phyl": new Rule("phyl", "phyl", new RList([
+	"phyl": new Rule("phyl", "phyl", new RObj([
 	])),
 };
 const options: { [name: string]: BppOpt; } = {
