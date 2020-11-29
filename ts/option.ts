@@ -19,7 +19,9 @@ class BppOpt{
 			fatal(this.name + ".push: index out of bounds: " + i);
 		if(this.update !== null)
 			this.update();
-		const e = new Expr(this, this.rlist[i], this.expr.length + 1);
+		const id = this.rule.val instanceof RSelect
+			? "" : (this.expr.length + 1).toString();
+		const e = new Expr(this, this.rlist[i], id);
 		this.expr.push(e);
 	}
 	set(i: number){
@@ -38,9 +40,13 @@ class BppOpt{
 			this.expr[0].pop();
 	}
 	pop(expr: Expr){
-		let i = expr.id - 1;
+		if(this.rule.val instanceof RSelect){
+			this.expr = [];
+			return;
+		}
+		let i = Number(expr.id) - 1;
 		this.expr.splice(i, 1);
 		for(; i<this.expr.length; i++)
-			this.expr[i].setid(i + 1);
+			this.expr[i].setid((i + 1).toString());
 	}
 }

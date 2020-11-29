@@ -1,5 +1,5 @@
 const rules: { [name: string]: Rule; } = {
-	"alpha": new Rule("alpha", "alpha", new RSelect([
+	"alphabet": new Rule("", "", new RSelect([
 		new Rule("DNA", "DNA"),
 		new Rule("RNA", "RNA"),
 		new Rule("Protein", "Protein"),
@@ -92,7 +92,7 @@ const rules: { [name: string]: Rule; } = {
 	])),
 };
 const options: { [name: string]: BppOpt; } = {
-	"alpha": new BppOpt("alpha", () => {
+	"alphabet": new BppOpt("alphabet", () => {
 		options["seq"].nuke();
 	}),
 	"seq": new BppOpt("seq"),

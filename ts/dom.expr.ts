@@ -16,7 +16,7 @@ class ExprElem{
 		this.equals = addspan(this.div, " = ");
 		this.value = addspan(this.div);
 	}
-	setid(i: number){
+	setid(id: string){
 		this.label.textContent = this.expr.ref();
 	}
 	pop(){

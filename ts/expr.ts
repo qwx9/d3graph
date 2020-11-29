@@ -1,21 +1,20 @@
 class Expr{
 	readonly el: ExprElem;
 	readonly option: BppOpt;
-	id: number;
+	id: string;
 	sym: Sym;
 
-	constructor(option: BppOpt, rule: Rule, id: number){
+	constructor(option: BppOpt, rule: Rule, id: string){
 		this.option = option;
 		this.id = id;
 		this.el = new ExprElem(this);
 		this.sym = new Sym(this, rule);
 	}
-	setid(i: number){
-		this.id = i;
-		this.el.setid(i);
+	setid(id: string){
+		this.id = id;
+		this.el.setid(id);
 	}
 	ref(suff: string | null = null): string{
-		(suff);
 		return this.option.name + this.id;
 	}
 	compile(): string{

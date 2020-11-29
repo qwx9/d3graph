@@ -1,4 +1,7 @@
+- only one seq file, only one tree file
 - VFileObj: input file
+
+
 - submissal
 	* seems fairly simple
 	* mdn: sending forms through javascript
@@ -7,16 +10,22 @@
 - references
 	* if a rule marks something as referable, reference a table of such available refs
 	* and whenever a new one is created, add it to the table
-	* aliases
 - actual valid bpp output: other options, etc
+
+
+- depending on alpha, a specific set of models is available + general ones
+	* seq shouldn't be reset at all
+
 
 - dom.val: paren management is fucked
 - select/list on root, should behave same as anywhere else
 - add terminal list option → has its own [x], shouldn't
 
 
-
-
+- aliases
+- one tree file may contain multiple trees
+in which case the config sym is different,
+handle this one way or another
 
 
 - error checking
@@ -32,6 +41,7 @@
 
 - maybe we don't even need to save any dom state in the dom objects, besides container
 - VString: check if string is admissible/valid
+	* is this even used anywhere? check (i/o params etc)
 
 
 
