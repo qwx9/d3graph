@@ -341,16 +341,16 @@ class Obj{
 		const sel = o.input as HTMLSelectElement;
 		const i = sel.selectedIndex - 1;
 
-		const sym = o.sym.setvals(i, sel.selectedOptions[0]);
+		const sym = o.sym.setvals(i, sel.options[0]);
 		if(sym === null)
 			return;
 
 		const d = adddiv(o.div);
 		FIXME:
-		const obj = new Obj(sym, d, sel.selectedOptions[0]);
+		const obj = new Obj(sym, d, sel.options[0]);
 		o.obj.push(obj);
 
-		sel.selectedOptions[0].disabled = true;
+		sel.options[0].disabled = true;
 		sel.selectedIndex = 0;
 	}
 };
