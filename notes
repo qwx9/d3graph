@@ -1,11 +1,3 @@
-- serialization
-	* alpha selection buggy
-		- can add multiple entries
-		- none register
-		- no reset on change
-		- should be no [+]
-		- rule == null → still trying to create a button
-		- => errors on console
 - VFileObj: input file
 - submissal
 	* seems fairly simple
@@ -19,6 +11,8 @@
 - actual valid bpp output: other options, etc
 
 - dom.val: paren management is fucked
+- select/list on root, should behave same as anywhere else
+- add terminal list option → has its own [x], shouldn't
 
 
 

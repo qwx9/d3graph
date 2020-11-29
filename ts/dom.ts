@@ -88,7 +88,7 @@ function addtext(parent: HTMLElement, text: string | null, action: () => void){
 	const e = newelement("input") as HTMLInputElement;
 	e.setAttribute("type", "text");
 	if(text !== null)
-		e.textContent = text;
+		e.value = text;
 	e.addEventListener("change", action);
 	parent.appendChild(e);
 	return e;
