@@ -129,7 +129,7 @@ abstract class VMulti implements Value{
 	compile(){
 		let s = "(";
 		const k = Object.keys(this.parms);
-		for(let i = 0; i<k.length; i++){
+		for(let i=0; i<k.length; i++){
 			s += this.parms[k[i]].compile();
 			if(i < k.length - 1)
 				s += ", ";

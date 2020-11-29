@@ -1,3 +1,6 @@
+function pushfile(sym: Sym, file: HTMLInputElement){
+	files[sym.parent.ref()] = file;
+}
 function showerrors(){
 	document.getElementById("errors").textContent = "No errors.";
 }
@@ -7,9 +10,11 @@ function showcompiled(){
 	const s = compile();
 	showerrors();
 	s.forEach((e) => {
-		addspan(r, e);
-		addbr(r);
+		r.innerHTML += e + "<br>";
 	});
+	r.innerHTML += "<br>Files:<br>";
+	for(let k in files)
+		r.innerHTML += k + ": " + files[k].files[0].name + "<br>";
 }
 function submit(){
 

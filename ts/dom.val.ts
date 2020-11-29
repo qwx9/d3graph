@@ -123,14 +123,14 @@ abstract class VMultiElem{
 			this.select.options[i].disabled = true;
 			this.select.selectedIndex = 0;
 			if(Object.keys(this.val.parms).length > 1)
-				addspanbeforelast(this.val.sym.el.value, ", ");
+				addspanbeforelast(this.sym.el.value, ", ");
 			this.parms[this.val.rules[i - 1].sym] = this.select.options[i];
 		}
 	}
 	popchild(ref: string){
 		if(this.parms.hasOwnProperty(ref)){
 			this.parms[ref].disabled = false;
-			const spar = this.val.sym.el.value;
+			const spar = this.sym.el.value;
 			let s = spar.children[spar.childElementCount-1];
 			if(s.textContent === ", ")
 				s.remove();
@@ -153,8 +153,13 @@ class VObjElem extends VMultiElem{
 	}
 }
 class VFileObjElem extends VMultiElem{
+	readonly file: HTMLInputElement;
+
 	constructor(val: VFileObj){
 		super(val);
+		this.file = addfile(this.sym.parent.el.value, () => {
+			pushfile(this.sym, this.file);
+		});
 	}
 	sel(v: VFileObjElem){
 		this.seldefault();

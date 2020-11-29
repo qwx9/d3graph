@@ -19,8 +19,8 @@ const rules: { [name: string]: Rule; } = {
 			])),
 		])),
 	])),
-	"seq": new Rule("seq", "seq", new RObj([
-		new Rule("Fasta", "Fasta", new RObj([
+	"seq": new Rule("seq", "seq", new RSelect([
+		new Rule("Fasta", "Fasta", new RFileObj([
 			new Rule("extended", "extended", new RBool()),
 			new Rule("strictNames", "strictNames", new RBool()),
 		])),
@@ -48,7 +48,7 @@ const rules: { [name: string]: Rule; } = {
 		new Rule("Nexus", "Nexus", new RFileObj([])),
 		new Rule("Genbank", "Genbank", new RFileObj([])),
 	])),
-	"tree": new Rule("tree", "tree", new RObj([
+	"tree": new Rule("tree", "tree", new RSelect([
 		new Rule("Newick", "Newick", new RFileObj([])),
 		new Rule("Nexus", "Nexus", new RFileObj([])),
 		new Rule("NHX", "NHX", new RFileObj([])),
@@ -103,5 +103,6 @@ const options: { [name: string]: BppOpt; } = {
 	"proc": new BppOpt("proc"),
 	"phyl": new BppOpt("phyl"),
 };
+let files: { [index: string]: HTMLInputElement } = {};
 
 registersubmit();
