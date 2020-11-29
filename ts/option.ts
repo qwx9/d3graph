@@ -34,10 +34,8 @@ class BppOpt{
 		return s;
 	}
 	nuke(){
-		this.expr.forEach((e) => {
-			e.pop();
-		});
-		this.expr = [];
+		while(this.expr.length > 0)
+			this.expr[0].pop();
 	}
 	pop(expr: Expr){
 		let i = expr.id - 1;
