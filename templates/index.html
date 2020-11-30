@@ -4,90 +4,14 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>query</title>
-	<style>
-		.box{
-			//width: 250px;
-			//height: 200px;
-			//border: 1px solid #720570;
-		}
-		.seq{
-			//width: 200px;
-			//height: 10px;
-			//background-color: #720570;
-		}
-	</style>
+	<style src="{{ url_for('static', filename='style.css') }}"></style>
 	<script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
-	<!--form id="allform"-->
-		<div id="alpha">
-			Alphabet:
-			<select id="alphasel" name="Alphabet" onchange="setone('alpha', this.selectedIndex)"></select>
-			<div id="alphadata"></div>
-		</div>
-		<br>
-		<div id="index1">
-			Index1:
-			<select id="index1sel" name="Type" onchange="setone('index1', this.selectedIndex)"></select>
-			<div id="index1data"></div>
-		</div>
-		<br>
-		<div id="index2">
-			Index2:
-			<select id="index2sel" name="Type" onchange="setone('index2', this.selectedIndex)"></select>
-			<div id="index2data"></div>
-		</div>
-		<br>
-		<div id="seq">
-			Sequences:
-			<select id="seqsel" name="Type" onchange="setcur('seq', this.selectedIndex)"></select>
-			<button onclick="add('seq')">Add</button>
-			<div id="seqdata"></div>
-		</div>
-		<br>
-		<div id="tree">
-			Tree:
-			<select id="treesel" name="Type" onchange="setcur('tree', this.selectedIndex)"></select>
-			<button onclick="add('tree')">Add</button>
-			<div id="treedata"></div>
-		</div>
-		<br>
-		<div id="model">
-			Model:
-			<select id="modelsel" name="Type" onchange="setcur('model', this.selectedIndex)"></select>
-			<button onclick="add('model')">Add</button>
-			<div id="modeldata"></div>
-		</div>
-		<br>
-		<div id="root">
-			Root:
-			<select id="rootsel" name="Type" onchange="setcur('root', this.selectedIndex)"></select>
-			<button onclick="add('root')">Add</button>
-			<div id="rootdata"></div>
-		</div>
-		<br>
-		<div id="rate">
-			Rate:
-			<select id="ratesel" name="Type" onchange="setcur('rate', this.selectedIndex)"></select>
-			<button onclick="add('rate')">Add</button>
-			<div id="ratedata"></div>
-		</div>
-		<br>
-		<div id="proc">
-			Process:
-			<select id="procsel" name="Type" onchange="setcur('proc', this.selectedIndex)"></select>
-			<button onclick="add('proc')">Add</button>
-			<div id="procdata"></div>
-		</div>
-		<br>
-		<div id="phyl">
-			Phylogeny:
-			<select id="phylsel" name="Type" onchange="setcur('phyl', this.selectedIndex)"></select>
-			<button onclick="add('phyl')">Add</button>
-			<div id="phyldata"></div>
-		</div>
-		<br>
-		<button onclick="submit()">Submit</button>
-	<!--/form-->
+ 	<div id="root"></div>
+	<br>
+	<div id="errors"></div>
+	<br>
+	<div id="result"></div>
 </body>
 </html>
