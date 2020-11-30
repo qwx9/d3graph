@@ -17,4 +17,19 @@ ts/val.ts \
 ts/main.ts \
 )
 cat ${files[@]} >static/app.ts
-npx tsc
+npx tsc \
+	-t ES5 \
+	-m commonjs \
+	--strict \
+	--noImplicitAny \
+	--strictNullChecks \
+	--strictFunctionTypes \
+	--strictBindCallApply \
+	--strictPropertyInitialization \
+	--noImplicitThis \
+	--alwaysStrict \
+	--noUnusedLocals \
+	--noUnusedParameters \
+	--noImplicitReturns \
+	--noFallthroughCasesInSwitch \
+	static/app.ts
