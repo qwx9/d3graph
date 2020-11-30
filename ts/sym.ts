@@ -21,7 +21,7 @@ class Sym{
 	set(val: number){
 		if(this.val === null)
 			fatal(this.ref() + ": cannot set null value");
-		this.val.set(val);
+		this.val!.set(val);
 	}
 	compile(): string{
 		return this.rule.sym + (this.val === null ? "" : this.val.compile());

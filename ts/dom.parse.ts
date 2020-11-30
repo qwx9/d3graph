@@ -2,10 +2,10 @@ function pushfile(sym: Sym, file: HTMLInputElement){
 	files[sym.parent.ref()] = file;
 }
 function showerrors(){
-	document.getElementById("errors").textContent = "No errors.";
+	document.getElementById("errors")!.textContent = "No errors.";
 }
 function showcompiled(){
-	const r = document.getElementById("result");
+	const r = document.getElementById("result") as HTMLDivElement;
 	r.innerHTML = "";
 	const s = compile();
 	showerrors();
@@ -14,7 +14,7 @@ function showcompiled(){
 	});
 	r.innerHTML += "<br>Files:<br>";
 	for(let k in files)
-		r.innerHTML += k + ": " + files[k].files[0].name + "<br>";
+		r.innerHTML += k + ": " + files[k].files![0].name + "<br>";
 }
 function submit(){
 

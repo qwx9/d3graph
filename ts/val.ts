@@ -11,7 +11,8 @@ class VBool implements Value{
 	val: boolean;
 
 	constructor(r: RBool, sym: Sym){
-		(sym);
+		this.sym = sym;
+		this.val = false;
 		this.set(r.def);
 		this.el = new VBoolElem(this);
 	}
@@ -32,6 +33,7 @@ class VInteger implements Value{
 	val: number;
 
 	constructor(r: RInteger, sym: Sym){
+		this.val = 0;
 		this.set(r.def);
 		this.sym = sym;
 		this.el = new VIntegerElem(this);
@@ -53,6 +55,7 @@ class VPropor implements Value{
 	val: number;
 
 	constructor(r: RPropor, sym: Sym){
+		this.val = 0;
 		this.set(r.def);
 		this.sym = sym;
 		this.el = new VProporElem(this);
@@ -76,6 +79,7 @@ class VFloat implements Value{
 	val: number;
 
 	constructor(r: RFloat, sym: Sym){
+		this.val = 0;
 		this.set(r.def);
 		this.sym = sym;
 		this.el = new VFloatElem(this);
@@ -99,6 +103,7 @@ class VString implements Value{
 	val: string;
 
 	constructor(r: RString, sym: Sym){
+		this.val = "";
 		this.set(r.def);
 		this.sym = sym;
 		this.el = new VStringElem(this);
@@ -116,14 +121,14 @@ class VString implements Value{
 }
 
 abstract class VMulti implements Value{
-	readonly el: VMultiElem;
+	readonly el!: VMultiElem;
 	readonly sym: Sym;
 	readonly rules: Rule[];
 	parms: { [name: string]: Sym; };
 
 	constructor(r: Ruleval, sym: Sym){
 		this.sym = sym;
-		this.rules = r.rules;
+		this.rules = r.rules as Rule[];
 		this.parms = {};
 	}
 	compile(){

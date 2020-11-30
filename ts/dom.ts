@@ -47,7 +47,7 @@ function addoption(sel: HTMLSelectElement, val: string, disabled: boolean = fals
 	return e;
 }
 
-function addselect(parent: HTMLDivElement, array: any[], attr: string, disable: boolean, action: () => void){
+function addselect(parent: HTMLDivElement, array: any[], attr: string, disable: boolean, action: (() => void) | null){
 	const e = newelement("select") as HTMLSelectElement;
 	array.forEach((v) => {
 		addoption(e, v[attr], disable);
@@ -58,7 +58,7 @@ function addselect(parent: HTMLDivElement, array: any[], attr: string, disable: 
 	return e;
 }
 
-function addselectfn(parent: HTMLElement, fn: (HTMLSelectElemen) => void, action: () => void){
+function addselectfn(parent: HTMLElement, fn: (a: HTMLSelectElement) => void, action: () => void){
 	const e = newelement("select") as HTMLSelectElement;
 	fn(e);
 	if(action !== null)

@@ -3,13 +3,13 @@ class BppOpt{
 	readonly name: string;
 	readonly rule: Rule;
 	readonly rlist: Rule[];
-	readonly update: () => void | null;
+	readonly update: (() => void) | null;
 	expr: Expr[];
 
 	constructor(name: string, update: (() => void) | null = null){
 		this.name = name;
 		this.rule = rules[name];
-		this.rlist = this.rule.val.rules;
+		this.rlist = this.rule.val!.rules as Rule[];
 		this.expr = [];
 		this.update = update;
 		this.el = new BppOptElem(this);
@@ -29,7 +29,7 @@ class BppOpt{
 		this.push(i);
 	}
 	compile(){
-		let s = [];
+		let s: string[] = [];
 		this.expr.forEach((e) => {
 			s.push(e.compile());
 		});

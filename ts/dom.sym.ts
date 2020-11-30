@@ -10,8 +10,10 @@ class SymElem{
 		this.isobj = sym.rule.val instanceof RObj || sym.rule.val instanceof RFileObj;
 		this.span = addspan(sym.parent.el.value, null);
 		this.label = addspan(this.span, sym.rule.sym);
-		if(sym.val === null)
+		if(sym.val === null){
+			this.value = addspan(this.span);
 			return this;
+		}
 		if(this.isobj)
 			addspan(this.span, "(");
 		this.value = addspan(this.span);

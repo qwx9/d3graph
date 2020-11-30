@@ -1,5 +1,5 @@
 interface Ruleval{
-	readonly rules?;
+	readonly rules?: Rule[];
 	putval(sym: Sym): Value;
 }
 
@@ -96,6 +96,6 @@ class Rule{
 	putval(sym: Sym): Value{
 		if(this.val === null)
 			fatal("rule " + this.label + ": cannot create from null value");
-		return this!.val.putval(sym);
+		return this.val!.putval(sym);
 	}
 }

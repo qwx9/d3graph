@@ -97,7 +97,7 @@ abstract class VMultiElem{
 	readonly val: VMulti;
 	readonly sym: Sym;
 	readonly span: HTMLSpanElement;
-	readonly select: HTMLSelectElement;
+	readonly select!: HTMLSelectElement;
 	parms: { [name: string]: HTMLOptionElement; };
 
 	constructor(val: VMulti){
@@ -116,7 +116,7 @@ abstract class VMultiElem{
 			});
 		}
 	}
-	abstract sel(VMultiElem): void;
+	abstract sel(v: VMultiElem): void;
 	seldefault(){
 		const i = this.select.selectedIndex;
 		if(this.val.set(i - 1)){
@@ -162,7 +162,7 @@ class VFileObjElem extends VMultiElem{
 		});
 	}
 	sel(v: VFileObjElem){
-		this.seldefault();
+		v.seldefault();
 	}
 }
 class VSelectElem extends VMultiElem{
@@ -170,9 +170,9 @@ class VSelectElem extends VMultiElem{
 		super(val);
 	}
 	sel(v: VSelectElem){
-		const i = this.select.selectedIndex;
-		if(this.val.set(i - 1))
-			this.parms[this.val.rules[i - 1].sym] = this.select.options[i];
+		const i = v.select.selectedIndex;
+		if(v.val.set(i - 1))
+			v.parms[v.val.rules[i - 1].sym] = v.select.options[i];
 	}
 }
 /*
