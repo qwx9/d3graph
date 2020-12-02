@@ -92,6 +92,80 @@ class VStringElem{
 		this.span.remove();
 	}
 }
+class VRefElem{
+	readonly val: VRef;
+	readonly sym: Sym;
+	readonly refeltab: VRefElem[];
+	readonly span: HTMLSpanElement;
+	readonly select: HTMLSelectElement;
+
+	constructor(val: VRef){
+		this.val = val;
+		this.sym = val.sym;
+		if(!refeltab.hasOwnProperty(val.refidx))
+			refeltab[val.refidx] = [];
+		this.refeltab = refeltab[val.refidx];
+		this.refeltab.push(this);
+		this.span = addspan(val.sym.el.value);
+		this.select = addselectfn(this.span, (e) => {
+			addoption(e, " -- ", true, true);
+			addoption(e, " new value ");
+			this.val.reftab.forEach((s) => {
+				addoption(e, s!.ref());
+			});
+		}, () => {
+			this.sel();
+		});
+	}
+	sel(){
+		const i = this.select.selectedIndex;
+		if(i == 1){
+			this.val.set(null);
+			this.update(false);
+		/* val.set calls this.popchild→this.update itself */
+		}else
+			this.val.set(i - 2);
+	}
+	update(fixidx: boolean){
+		const sym = this.val.val as Sym;
+		const reftab = this.val.reftab;
+		for(let i=0; i<this.refeltab.length; i++){
+			let e = this.refeltab[i];
+			if(e !== this)
+				continue;
+			if(fixidx){
+				for(let i=0, opi=2; i<reftab.length; i++){
+					if(reftab[i] === this.val.sym){
+						e.select.options[opi].remove();
+						if(e.select.selectedIndex == opi){
+							e.val.val = null;
+							e.select.selectedIndex = 0;
+						}else if(e.select.selectedIndex > opi)
+							e.select.selectedIndex--;
+					}else if(reftab[i] !== e.val.sym){
+						const ref = e.val.sym!.ref();
+						e.select.options[opi].value = ref;
+						e.select.options[opi].textContent = ref;
+						opi++;
+					}
+				}
+			}else
+				addoption(e.select, sym.ref());
+		}
+	}
+	pop(){
+		/* val.pop calls this.popchild→this.update itself */
+		for(let i=0; i<this.refeltab.length; i++)
+			if(this.refeltab[i] == this){
+				this.refeltab.splice(i, 1);
+				break;
+			}
+		this.span.remove();
+	}
+	popchild(){
+		this.update(true);
+	}
+};
 
 abstract class VMultiElem{
 	readonly val: VMulti;
@@ -109,7 +183,7 @@ abstract class VMultiElem{
 			this.select = addselectfn(this.span, (e) => {
 				addoption(e, " -- ", true, true);
 				this.val.rules.forEach((r) => {
-					addoption(e, r.sym);
+					addoption(e, r.label);
 				});
 			}, () => {
 				this.sel(this);

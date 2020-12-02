@@ -53,6 +53,18 @@ class RString implements Ruleval{
 		return new VString(this, sym);
 	}
 }
+class RRef implements Ruleval{
+	readonly rule: Rule;
+	readonly short: boolean;
+
+	constructor(short: boolean, rule: Rule){
+		this.short = short;
+		this.rule = rule;
+	}
+	putval(sym: Sym): Value{
+		return new VRef(this, sym);
+	}
+}
 class RObj implements Ruleval{
 	readonly rules: Rule[];
 

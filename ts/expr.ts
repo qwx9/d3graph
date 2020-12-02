@@ -14,6 +14,9 @@ class Expr{
 		this.id = id;
 		this.el.setid(id);
 	}
+	rootid(){
+		return this.id;
+	}
 	ref(suff: string | null = null): string{
 		(suff);
 		return this.option.name + this.id;

@@ -1,12 +1,46 @@
-- references
-	* if a rule marks something as referable, reference a table of such available refs
-	* and whenever a new one is created, add it to the table
+- ref sym ref's need to skip the actual ref element, so does compilation
+- references for trees/seqs/models/etc: different type of RRef?
+	* refs are indices, not names
+	* multiple and exclusive values: combination of phyl or proc + data
+		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
+- new changes based on new manual...
+	* user|random for input
 - actual valid bpp output: other options, etc
 	* use sym/label of root rule in bppopt to set the actual bpp value we need
+	* seq, tree, etc: spread out over multiple options
+
+
+- file upload: rename file when sending to server
 
 
 - depending on alpha, a specific set of models is available + general ones
 	* seq shouldn't be reset at all
+- distributions: can't really duplicate all of these options all over the place...
+	* we should therefore define a way to refer to a list/subtree of options,
+	not synonyms
+	* or just not generalize that much and define rules for distributions elsewhere
+	that we can select from?
+- bppml specific options
+- aliases
+	* forward/backward aliases?
+- error checking
+	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
+	* or keep state around without recalculating anything, but more bug-prone
+- visuals/css: css framework
+	* tooltips for description/type/information/links to doc
+	* left pane: list of model components
+	* right pane: onselect, description
+	* hide unused/uninitialized primitives?
+- ruleset generation
+	* right now, giant object of objects, easy to fuck up
+	* will instead have a file with the simplest possible format
+	* transpiled to typescript, all ts concatenated into app.ts, then transpile to app.js
+	* NECESSARY!
+
+
+- add a way to load input file without parsing it and submit it raw
+	=> easy to do, just select file and send that to the server instead of compil
+- output ui result and edit prior to submit ⇒ textarea
 
 
 - customize file input shit
@@ -15,94 +49,29 @@
 - dom.val: paren management is fucked
 - select/list on root, should behave same as anywhere else
 - add terminal list option → has its own [x], shouldn't
-
-
-- aliases
-- one tree file may contain multiple trees
-in which case the config sym is different,
-handle this one way or another
-
-
-- error checking
-	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
-	* or keep state around without recalculating anything, but more bug-prone
-- visuals/css
-	* vertical tabs? hide/unhide panes?
-	* tooltips for description/type/information/links to doc
-	* left pane: list of model components
-	* right pane: onselect, description
-	* group components this way, avoids all on one page
-	* use bootstrap to prettify, or anything else that automates this?
-
 - maybe we don't even need to save any dom state in the dom objects, besides container
 - VString: check if string is admissible/valid
 	* is this even used anywhere? check (i/o params etc)
-
-- load input file without parsing it and submit it raw
-- output ui result and edit prior to submit ⇒ textarea
-
-
-- ruleset generation
-	* right now, giant object of objects, easy to fuck up
-	* will instead have a file with the simplest possible format
-	* transpiled to typescript, all ts concatenated into app.ts, then transpile to app.js
-- extra
-	* read evolutionary model from input text file
-	* revisit visualization with graphs
-
-
-what we did
-- see commit message
-- interface simplification: dom controls have become completely trivial to write
-	* recursive as well, so parent elements don't care about children implementation
-	* so children can be different depending on data type etc, parent doesn't care
-
-
-- set ref if there's children -> children remain, state fucked
-- numeric opts can't reference other values
-- Rule refs are not fixed
-
-
-
-- error checks, keep track of inconsistencies
-	* thus far, not much to actually do here
-
-- add information to Rule: existing instances of the given Rule (-> Sym[])
-	* in definition: .ref → ref into a ruletab[], and .canalias → list existing instances of THAT Rule (or self)
-	* Rule → will have to allow multiple (exclusive) values: phylogeny: combination of phylogenies or proc+data, etc
-
-- required arguments -> auto add
-
-
-- hide unused/uninitialized primitives
-
-- frequency set: must select one (default), can't just dangle
-- implement cross-object references: seq, tree, model, etc.
-	. practically everything can be referenced
-	. but referencing another object is restricted
-- error checking: keep track of what's needed: constraints unmet
-	. we know ahead of time what's missing
-	. or do we? what happens if we add aliases etc?
-	. might not be an issue
-	. in other words, barring other problems during compilations,
-	we can warn of missing shit ahead of time,
-	just by keeping track of a todo list
-	. update: delete/add/modify shit
+- required arguments? -> auto add
 - add a way to name and reference tree nodes
 	. default names, or indices from files?
 	. no error checking since we can't parse tree anyway
 	. just always use indices for nodes?
 	. user could specify tree shape?
+	⇒ no parsing, user does this manually, fuck it
 - variable naming in bpp: model1-2-3: model1 parameter _1, see how shit is automatically named
 	. important for references
 	. HKY85.kappa_1, not model1.kappa
 	. but in spec: process1=Nonhomogeneous(model1=1, model2=2)
 		tree=2, rate=1, etc.
+- documentation, links towards
+	* note: as stateless as possible (which also means redundancies)
+
+
+- frequency set: must select one (default), can't just dangle
 - if there's an error on input which bppml detects immediately:
 	. show query page with same parametrization and error messages
 	. allow basically recompiling the config and sending new files
 		* or keeping old otherwise
 - implement all options from bpp manual
-	. some are hierarchical: one alphabel -> set of possible models
 - index1, index2: accessoire
-- output mandatory .profile to ease postprocessing?

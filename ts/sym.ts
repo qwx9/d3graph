@@ -1,16 +1,19 @@
 class Sym{
 	readonly el: SymElem;
 	readonly parent: Expr | Sym;
-	readonly parentval: VObj | VFileObj | null;
+	readonly parentval: VParentNode | null;
 	readonly rule: Rule;
 	val: Value | null;
 
-	constructor(parent: Expr | Sym, rule: Rule, parentval: VObj | VFileObj | null = null){
+	constructor(parent: Expr | Sym, rule: Rule, parentval: VParentNode | null = null){
 		this.parent = parent;
 		this.parentval = parentval;
 		this.rule = rule;
 		this.el = new SymElem(this);
 		this.val = rule.val === null ? null : rule.putval(this);
+	}
+	rootid(): string{
+		return this.parent.rootid();
 	}
 	ref(suff: string | null = null): string{
 		let r = this.parent.ref(this.rule.sym);

@@ -1,4 +1,5 @@
-const rules: { [name: string]: Rule; } = {
+let reftab: { [name: string]: Sym[] } = {};
+const rules: { [name: string]: Rule } = {
 	"alphabet": new Rule("", "", new RSelect([
 		new Rule("DNA", "DNA"),
 		new Rule("RNA", "RNA"),
@@ -56,30 +57,62 @@ const rules: { [name: string]: Rule; } = {
 	"model": new Rule("model", "model", new RObj([
 		new Rule("JC69", "JC69", new RObj([])),
 		new Rule("K80", "K80", new RObj([
-			new Rule("kappa", "kappa", new RFloat()),
+			new Rule("kappa", "kappa", new RRef(false,
+				new Rule("kappa", "kappa", new RFloat())
+			)),
 		])),
 		new Rule("F84", "F84", new RObj([
-			new Rule("kappa", "kappa", new RFloat()),
-			new Rule("theta", "theta", new RFloat()),
-			new Rule("theta1", "theta_1", new RFloat()),
-			new Rule("theta2", "theta_2", new RFloat()),
+			new Rule("kappa", "kappa", new RRef(false,
+				new Rule("kappa", "kappa", new RFloat())
+			)),
+			new Rule("theta", "theta", new RRef(false,
+				new Rule("theta", "theta", new RFloat())
+			)),
+			new Rule("theta1", "theta", new RRef(false,
+				new Rule("theta1", "theta_1", new RFloat())
+			)),
+			new Rule("theta2", "theta", new RRef(false,
+				new Rule("theta2", "theta_2", new RFloat())
+			)),
 		])),
 		new Rule("HKY85", "HKY85", new RObj([
-			new Rule("kappa", "kappa", new RFloat()),
-			new Rule("theta", "theta", new RFloat()),
-			new Rule("theta1", "theta_1", new RFloat()),
-			new Rule("theta2", "theta_2", new RFloat()),
+			new Rule("kappa", "kappa", new RRef(false,
+				new Rule("kappa", "kappa", new RFloat())
+			)),
+			new Rule("theta", "theta", new RRef(false,
+				new Rule("theta", "theta", new RFloat())
+			)),
+			new Rule("theta1", "theta", new RRef(false,
+				new Rule("theta1", "theta_1", new RFloat())
+			)),
+			new Rule("theta2", "theta", new RRef(false,
+				new Rule("theta2", "theta_2", new RFloat())
+			)),
 		])),
 		new Rule("T92", "T92", new RObj([
-			new Rule("kappa", "kappa", new RFloat()),
-			new Rule("theta", "theta", new RFloat()),
+			new Rule("kappa", "kappa", new RRef(false,
+				new Rule("kappa", "kappa", new RFloat())
+			)),
+			new Rule("theta", "theta", new RRef(false,
+				new Rule("theta", "theta", new RFloat())
+			)),
 		])),
 		new Rule("TN93", "TN93", new RObj([
-			new Rule("kappa1", "kappa_1", new RFloat()),
-			new Rule("kappa2", "kappa_2", new RFloat()),
-			new Rule("theta", "theta", new RFloat()),
-			new Rule("theta1", "theta_1", new RFloat()),
-			new Rule("theta2", "theta_2", new RFloat()),
+			new Rule("kappa1", "kappa", new RRef(false,
+				new Rule("kappa1", "kappa_1", new RFloat())
+			)),
+			new Rule("kappa2", "kappa", new RRef(false,
+				new Rule("kappa2", "kappa_2", new RFloat())
+			)),
+			new Rule("theta", "theta", new RRef(false,
+				new Rule("theta", "theta", new RFloat())
+			)),
+			new Rule("theta1", "theta", new RRef(false,
+				new Rule("theta1", "theta_1", new RFloat())
+			)),
+			new Rule("theta2", "theta", new RRef(false,
+				new Rule("theta1", "theta_1", new RFloat())
+			)),
 		])),
 	])),
 	"root": new Rule("root", "root", new RObj([
@@ -91,8 +124,10 @@ const rules: { [name: string]: Rule; } = {
 	"phyl": new Rule("phyl", "phyl", new RObj([
 	])),
 };
-const options: { [name: string]: BppOpt; } = {
+let refeltab: { [name: string]: VRefElem[] } = {};
+const options: { [name: string]: BppOpt } = {
 	"alphabet": new BppOpt("alphabet", () => {
+		// FIXME: don't touch seqs, set subset of available models
 		options["seq"].nuke();
 	}),
 	"seq": new BppOpt("seq"),
