@@ -6,9 +6,6 @@
 - type for misc parameter: string translated directly
 	* RVerbatim?
 	* example → other tree params
-- (re)implement alphabet
-- (re)implement sequence loading
-- (re)implement tree loading
 - implement top-level options and alpha/seq/tree-specific options
 	* need to decouple sym from label more, as well as numbering
 - RPtr type or similar and separate tables

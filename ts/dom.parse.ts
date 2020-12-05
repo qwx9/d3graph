@@ -20,7 +20,7 @@ function submit(){
 	const s = showcompiled();
 	fd.append("bpp", s.join("\n"));
 	for(let k in files)
-		fd.append(k, files[k].files![0]);
+		fd.append(k, files[k].files![0], k);
 
 	const xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = () => {
