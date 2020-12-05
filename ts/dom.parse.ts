@@ -1,12 +1,10 @@
-function pushfile(sym: Sym, file: HTMLInputElement){
-	files[sym.parent.ref()] = file;
-}
 function showerrors(){
 	//document.getElementById("errors")!.textContent = "No errors.";
 }
 function showcompiled(){
 	const r = document.getElementById("result") as HTMLDivElement;
 	r.innerHTML = "";
+	files = {};
 	const s = compile();
 	showerrors();
 	s.forEach((e) => {

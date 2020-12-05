@@ -1,7 +1,11 @@
-- file object → just a non-mandatory path= argument
-	* error checking will force mandatory argument
-- index: depends on whether or not multiple (duplicated) values are allowed
+- reselect + bare options no longer works, should be parm=val, not parm(val)
 - types for one/once/any
+	* ROne, ROnce, RAny in place of RObj, RSelect, etc
+	* used to disable existing params in dom
+	* index: depends on whether or not multiple (duplicated) values are allowed
+- type for misc parameter: string translated directly
+	* RVerbatim?
+	* example → other tree params
 - (re)implement alphabet
 - (re)implement sequence loading
 - (re)implement tree loading
@@ -46,9 +50,11 @@
 - error checking
 	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
 	* or keep state around without recalculating anything, but more bug-prone
+	* file paths
 
 
 
+- val.ts: ValueElem .el in interface and add standard .set() and .pop()/.nuke()/etc
 
 - ref sym ref's need to skip the actual ref element, so does compilation
 

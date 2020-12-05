@@ -92,6 +92,28 @@ class VStringElem{
 		this.span.remove();
 	}
 }
+class VFileElem{
+	readonly val: VFile;
+	readonly sym: Sym;
+	readonly span: HTMLSpanElement;
+	readonly file: HTMLInputElement;
+
+	constructor(val: VFile){
+		this.val = val;
+		this.sym = val.sym;
+		this.span = addspan(val.sym.el.value);
+		this.file = addfile(this.sym.parent.el.value, () => {
+			this.val.set(this.file.files![0].name);
+		});
+	}
+	getfile(){
+		return this.file;
+	}
+	pop(){
+		this.span.remove();
+	}
+}
+
 class VRefElem{
 	readonly val: VRef;
 	readonly sym: Sym;
@@ -223,19 +245,6 @@ class VObjElem extends VMultiElem{
 		super(val);
 	}
 	sel(v: VObjElem){
-		v.seldefault();
-	}
-}
-class VFileObjElem extends VMultiElem{
-	readonly file: HTMLInputElement;
-
-	constructor(val: VFileObj){
-		super(val);
-		this.file = addfile(this.sym.parent.el.value, () => {
-			pushfile(this.sym, this.file);
-		});
-	}
-	sel(v: VFileObjElem){
 		v.seldefault();
 	}
 }

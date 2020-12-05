@@ -119,6 +119,32 @@ class VString implements Value{
 		this.el.pop();
 	}
 }
+class VFile implements Value{
+	readonly el: VFileElem;
+	readonly sym: Sym;
+	val: string;
+
+	constructor(r: RFile, sym: Sym){
+		(r);
+		this.val = "";
+		this.sym = sym;
+		this.el = new VFileElem(this);
+	}
+	set(val: string){
+		this.val = val;
+		return true;
+	}
+	compile(){
+		if(this.val !== "")
+			files[this.sym.parent.ref()] = this.el.getfile();
+		return "=" + this.val;
+	}
+	pop(){
+		if(this.val !== "")
+			delete files[this.sym.parent.ref()];
+		this.el.pop();
+	}
+}
 class VRef implements Value{
 	readonly el: VRefElem;
 	readonly sym: Sym;
@@ -242,15 +268,7 @@ class VObj extends VMulti{
 		this.el = new VObjElem(this);
 	}
 }
-class VFileObj extends VMulti{
-	readonly el: VFileObjElem;
-
-	constructor(r: RFileObj, sym: Sym){
-		super(r, sym);
-		this.el = new VFileObjElem(this);
-	}
-}
-type VParentNode = VObj | VFileObj | VRef;
+type VParentNode = VObj | VRef;
 
 class VSelect extends VMulti{
 	readonly el: VSelectElem;

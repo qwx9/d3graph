@@ -7,7 +7,7 @@ class SymElem{
 
 	constructor(sym: Sym){
 		this.sym = sym;
-		this.isobj = sym.rule.val instanceof RObj || sym.rule.val instanceof RFileObj;
+		this.isobj = sym.rule.val instanceof RObj;
 		this.span = addspan(sym.parent.el.value, null);
 		this.label = addspan(this.span, sym.rule.sym);
 		if(sym.val === null){

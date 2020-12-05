@@ -1,10 +1,11 @@
 let reftab: { [name: string]: Sym[] } = {};
 const rules: { [name: string]: Rule } = {
-	"alphabet": new Rule("alphabet", "alphabet", new RSelect([
+	"alphabet": new Rule("Alphabet", "alphabet", new RSelect([
 		new Rule("DNA", "DNA"),
 		new Rule("RNA", "RNA"),
 		new Rule("Protein", "Protein"),
 		new Rule("Binary", "Binary"),
+		new Rule("Lexicon", "Lexicon", new RString()),
 		new Rule("Word", "Word", new RObj([
 			new Rule("Letter", "letter", new RSelect([
 				new Rule("DNA", "DNA"),
@@ -20,39 +21,59 @@ const rules: { [name: string]: Rule } = {
 			])),
 		])),
 	])),
-	"seq": new Rule("input.data", "input.data", new RSelect([
-		new Rule("Fasta", "Fasta", new RFileObj([
-			new Rule("extended", "extended", new RBool()),
-			new Rule("strictNames", "strictNames", new RBool()),
-		])),
-		new Rule("Mase", "Mase", new RFileObj([
-			new Rule("siteSelection", "siteSelection", new RBool(true)),
-		])),
-		new Rule("Phylip", "Phylip", new RFileObj([
-			new Rule("order", "order", new RSelect([
-				new Rule("interleaved", "interleaved"),
-				new Rule("sequential", "sequential"),
-			])),
-			new Rule("type", "type", new RSelect([
-				new Rule("classic", "classic"),
-				new Rule("extended", "extended"),
-			])),
-			new Rule("split", "split", new RSelect([
-				new Rule("spaces", "spaces"),
-				new Rule("tab", "tab"),
-			])),
-		])),
-		new Rule("Clustal", "Clustal", new RFileObj([
-			new Rule("extraSpaces", "extraSpaces", new RBool()),
-		])),
-		new Rule("Dcse", "Dcse", new RFileObj([])),
-		new Rule("Nexus", "Nexus", new RFileObj([])),
-		new Rule("Genbank", "Genbank", new RFileObj([])),
+	"gencode": new Rule("Genetic code", "genetic_code", new RSelect([
+		new Rule("Standard (1)", "Standard"),
+		new Rule("VertebrateMitochondrial (2)", "VertebrateMitochondrial"),
 	])),
-	"tree": new Rule("input.tree", "input.tree", new RSelect([
-		new Rule("Newick", "Newick", new RFileObj([])),
-		new Rule("Nexus", "Nexus", new RFileObj([])),
-		new Rule("NHX", "NHX", new RFileObj([])),
+	"seq": new Rule("Sequence data", "input.data", new RObj([
+		new Rule("Aligned sequence", "alignment", new RObj([
+			new Rule("Path", "path", new RFile()),
+			new Rule("Format", "format", new RSelect([
+				new Rule("Fasta", "Fasta", new RObj([
+					new Rule("extended", "extended", new RBool()),
+					new Rule("strictNames", "strictNames", new RBool()),
+				])),
+				new Rule("Mase", "Mase", new RObj([
+					new Rule("siteSelection", "siteSelection", new RBool(true)),
+				])),
+				new Rule("Phylip", "Phylip", new RObj([
+					new Rule("order", "order", new RSelect([
+						new Rule("interleaved", "interleaved"),
+						new Rule("sequential", "sequential"),
+					])),
+					new Rule("type", "type", new RSelect([
+						new Rule("classic", "classic"),
+						new Rule("extended", "extended"),
+					])),
+					new Rule("split", "split", new RSelect([
+						new Rule("spaces", "spaces"),
+						new Rule("tab", "tab"),
+					])),
+				])),
+				new Rule("Clustal", "Clustal", new RObj([
+					new Rule("extraSpaces", "extraSpaces", new RBool()),
+				])),
+				new Rule("Dcse", "Dcse", new RObj([
+				])),
+				new Rule("Nexus", "Nexus", new RObj([
+				])),
+				new Rule("Genbank", "Genbank", new RObj([
+				])),
+			])),
+		])),
+	])),
+	"tree": new Rule("Tree data", "input.tree", new RObj([
+		new Rule("Random", "random", new RObj([
+			new Rule("Leaf data index", "data", new RInteger()),
+		])),
+		new Rule("User tree", "user", new RObj([
+			new Rule("Path", "path", new RFile()),
+			new Rule("Format", "format", new RSelect([
+				new Rule("Newick", "Newick"),
+				new Rule("Nexus", "Nexus"),
+				new Rule("NHX", "NHX"),
+			])),
+		])),
 	])),
 	"model": new Rule("model", "model", new RObj([
 		new Rule("JC69", "JC69", new RObj([])),
@@ -115,13 +136,13 @@ const rules: { [name: string]: Rule } = {
 			)),
 		])),
 	])),
-	"root": new Rule("root", "root", new RObj([
+	"root": new Rule("Root frequencies", "root", new RObj([
 	])),
-	"rate": new Rule("rate", "rate", new RObj([
+	"rate": new Rule("Substitution rate", "rate", new RObj([
 	])),
-	"proc": new Rule("proc", "proc", new RObj([
+	"proc": new Rule("Evolutionary process", "proc", new RObj([
 	])),
-	"phyl": new Rule("phyl", "phyl", new RObj([
+	"phyl": new Rule("Phylogeny", "phyl", new RObj([
 	])),
 };
 let refeltab: { [name: string]: VRefElem[] } = {};
@@ -130,6 +151,7 @@ const options: { [name: string]: BppOpt } = {
 		// FIXME: don't touch seqs, set subset of available models
 		options["seq"].nuke();
 	}),
+	"gencode": new BppOpt("gencode"),
 	"seq": new BppOpt("seq"),
 	"tree": new BppOpt("tree"),
 	"model": new BppOpt("model"),

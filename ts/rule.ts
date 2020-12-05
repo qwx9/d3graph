@@ -53,6 +53,13 @@ class RString implements Ruleval{
 		return new VString(this, sym);
 	}
 }
+class RFile implements Ruleval{
+	constructor(){
+	}
+	putval(sym: Sym): Value{
+		return new VFile(this, sym);
+	}
+}
 class RRef implements Ruleval{
 	readonly rule: Rule;
 	readonly short: boolean;
@@ -73,16 +80,6 @@ class RObj implements Ruleval{
 	}
 	putval(sym: Sym): Value{
 		return new VObj(this, sym);
-	}
-}
-class RFileObj implements Ruleval{
-	readonly rules: Rule[];
-
-	constructor(rules: Rule[]){
-		this.rules = rules;
-	}
-	putval(sym: Sym): Value{
-		return new VFileObj(this, sym);
 	}
 }
 class RSelect implements Ruleval{
