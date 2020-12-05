@@ -1,6 +1,6 @@
 let reftab: { [name: string]: Sym[] } = {};
 const rules: { [name: string]: Rule } = {
-	"alphabet": new Rule("", "", new RSelect([
+	"alphabet": new Rule("alphabet", "alphabet", new RSelect([
 		new Rule("DNA", "DNA"),
 		new Rule("RNA", "RNA"),
 		new Rule("Protein", "Protein"),
@@ -20,7 +20,7 @@ const rules: { [name: string]: Rule } = {
 			])),
 		])),
 	])),
-	"seq": new Rule("seq", "seq", new RSelect([
+	"seq": new Rule("input.data", "input.data", new RSelect([
 		new Rule("Fasta", "Fasta", new RFileObj([
 			new Rule("extended", "extended", new RBool()),
 			new Rule("strictNames", "strictNames", new RBool()),
@@ -49,7 +49,7 @@ const rules: { [name: string]: Rule } = {
 		new Rule("Nexus", "Nexus", new RFileObj([])),
 		new Rule("Genbank", "Genbank", new RFileObj([])),
 	])),
-	"tree": new Rule("tree", "tree", new RSelect([
+	"tree": new Rule("input.tree", "input.tree", new RSelect([
 		new Rule("Newick", "Newick", new RFileObj([])),
 		new Rule("Nexus", "Nexus", new RFileObj([])),
 		new Rule("NHX", "NHX", new RFileObj([])),

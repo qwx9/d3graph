@@ -19,7 +19,7 @@ class Expr{
 	}
 	ref(suff: string | null = null): string{
 		(suff);
-		return this.option.name + this.id;
+		return this.option.rule.sym + this.id;
 	}
 	compile(): string{
 		return this.ref() + " = " + this.sym.compile();

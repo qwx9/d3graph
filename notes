@@ -1,46 +1,63 @@
-- ref sym ref's need to skip the actual ref element, so does compilation
+- file object → just a non-mandatory path= argument
+	* error checking will force mandatory argument
+- index: depends on whether or not multiple (duplicated) values are allowed
+- types for one/once/any
+- (re)implement alphabet
+- (re)implement sequence loading
+- (re)implement tree loading
+- implement top-level options and alpha/seq/tree-specific options
+	* need to decouple sym from label more, as well as numbering
+- RPtr type or similar and separate tables
+	* like RRef, not included in compilation, just a indirection/dereferenciation
+	* maybe RRef == RPtr? but it's for rules, not values
+		- RRuleRef?
+- fix param references/RRef
+	* skip RRef name in compilation
+	* reference actually refers to model rule name, not model index
+	⇒ two types of RRef? indexed and non-indexed?
+	* only indexed refs are tree roots → model1,2,3 tree1,2,3 seq1,2,3
+		- therefore no need
+- referencing indexed elements ≠ their params → phyl, etc
+- implement list based on predicate (model list based on alphabet)
+	* multiple rule tables and refs between them
+	* distribution table, model tables by type
+	* refs to trees of rules, mutable or not
+	* these things can be intermixed for more complex situations and weird models
+		- any model with any whatever
+		- so, associative arrays? arrays with all (redundant) possibilities?
+		  array of concatenated sets?
 - references for trees/seqs/models/etc: different type of RRef?
 	* refs are indices, not names
 	* multiple and exclusive values: combination of phyl or proc + data
 		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
-- new changes based on new manual...
-	* user|random for input
-- actual valid bpp output: other options, etc
-	* use sym/label of root rule in bppopt to set the actual bpp value we need
-	* seq, tree, etc: spread out over multiple options
-
-
+- valid bpp output
 - file upload: rename file when sending to server
-
-
-- depending on alpha, a specific set of models is available + general ones
-	* seq shouldn't be reset at all
-- distributions: can't really duplicate all of these options all over the place...
-	* we should therefore define a way to refer to a list/subtree of options,
-	not synonyms
-	* or just not generalize that much and define rules for distributions elsewhere
-	that we can select from?
-- bppml specific options
-- aliases
-	* forward/backward aliases?
-- error checking
-	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
-	* or keep state around without recalculating anything, but more bug-prone
-- visuals/css: css framework
+- output ui result and edit prior to submit ⇒ textarea
+	* manually upload bpp file ⇒ load into text area
+	* then submit as is
+	* make sure we don't overwrite gui state if the text was changed manually
+- start thinking about ruleset spec language and transpilation to ts
+- visuals/css: minimal css-only framework
 	* tooltips for description/type/information/links to doc
 	* left pane: list of model components
 	* right pane: onselect, description
 	* hide unused/uninitialized primitives?
-- ruleset generation
-	* right now, giant object of objects, easy to fuck up
-	* will instead have a file with the simplest possible format
-	* transpiled to typescript, all ts concatenated into app.ts, then transpile to app.js
-	* NECESSARY!
+	* do as little css customization as possible
+- error checking
+	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
+	* or keep state around without recalculating anything, but more bug-prone
 
 
-- add a way to load input file without parsing it and submit it raw
-	=> easy to do, just select file and send that to the server instead of compil
-- output ui result and edit prior to submit ⇒ textarea
+
+
+- ref sym ref's need to skip the actual ref element, so does compilation
+
+
+- bppml specific options
+- aliases
+	* forward/backward aliases?
+
+
 
 
 - customize file input shit
