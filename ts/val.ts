@@ -119,6 +119,28 @@ class VString implements Value{
 		this.el.pop();
 	}
 }
+class VVerbatim implements Value{
+	readonly el: VVerbatimElem;
+	readonly sym: Sym;
+	val: string;
+
+	constructor(r: RVerbatim, sym: Sym){
+		(r);
+		this.val = "";
+		this.sym = sym;
+		this.el = new VVerbatimElem(this);
+	}
+	set(val: string){
+		this.val = val;
+		return true;
+	}
+	compile(){
+		return this.val;
+	}
+	pop(){
+		this.el.pop();
+	}
+}
 class VFile implements Value{
 	readonly el: VFileElem;
 	readonly sym: Sym;

@@ -53,6 +53,13 @@ class RString implements Ruleval{
 		return new VString(this, sym);
 	}
 }
+class RVerbatim implements Ruleval{
+	constructor(){
+	}
+	putval(sym: Sym): Value{
+		return new VVerbatim(this, sym);
+	}
+}
 class RFile implements Ruleval{
 	constructor(){
 	}

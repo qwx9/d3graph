@@ -2,9 +2,6 @@
 	* ROne, ROnce, RAny in place of RObj, RSelect, etc
 	* used to disable existing params in dom
 	* index: depends on whether or not multiple (duplicated) values are allowed
-- type for misc parameter: string translated directly
-	* RVerbatim?
-	* example → other tree params
 - implement top-level options and alpha/seq/tree-specific options
 - RPtr type or similar and separate tables
 	* like RRef, not included in compilation, just a indirection/dereferenciation
@@ -49,6 +46,8 @@
 
 
 
+- exceptions for sym.parent or sym.parent.parent instanceof Expr all over the place
+	* find a better and less bugprone way
 - val.ts: ValueElem .el in interface and add standard .set() and .pop()/.nuke()/etc
 
 - ref sym ref's need to skip the actual ref element, so does compilation

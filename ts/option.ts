@@ -21,7 +21,6 @@ class BppOpt{
 			this.update();
 		const id = this.rule.val instanceof RSelect
 			? "" : (this.expr.length + 1).toString();
-		//const e = new Expr(this, this.rlist[i], id);
 		const e = new Expr(this, i, id);
 		this.expr.push(e);
 	}

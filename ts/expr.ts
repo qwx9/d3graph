@@ -23,7 +23,6 @@ class Expr{
 		return this.option.rule.sym + this.id;
 	}
 	compile(): string{
-		//return this.ref() + " = " + this.sym.compile();
 		return this.sym.compile();
 	}
 	pop(){

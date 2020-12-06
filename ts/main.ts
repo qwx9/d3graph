@@ -73,6 +73,7 @@ const rules: { [name: string]: Rule } = {
 				new Rule("Nexus", "Nexus"),
 				new Rule("NHX", "NHX"),
 			])),
+			new Rule("Additional options", "", new RVerbatim()),
 		])),
 	])),
 	"model": new Rule("model", "model", new RObj([

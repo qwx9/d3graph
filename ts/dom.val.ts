@@ -92,6 +92,25 @@ class VStringElem{
 		this.span.remove();
 	}
 }
+class VVerbatimElem{
+	readonly val: VVerbatim;
+	readonly sym: Sym;
+	readonly span: HTMLSpanElement;
+	readonly text: HTMLInputElement;
+
+	constructor(val: VVerbatim){
+		this.val = val;
+		this.sym = val.sym;
+		this.span = addspan(val.sym.el.value);
+		this.text = addtext(this.span, this.val.val.toString(), () => {
+			if(this.val.set(this.text.value))
+				this.text.value = this.val.val;
+		});
+	}
+	pop(){
+		this.span.remove();
+	}
+}
 class VFileElem{
 	readonly val: VFile;
 	readonly sym: Sym;
