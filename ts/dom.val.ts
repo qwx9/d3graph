@@ -201,6 +201,10 @@ abstract class VMultiElem{
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
 		this.parms = {};
+		/* domvis-specific: must avoid duplicating control for root element
+		 * here its value */
+		if(this.sym.parent instanceof Expr)
+			return this;
 		if(val.rules.length > 0){
 			this.select = addselectfn(this.span, (e) => {
 				addoption(e, " -- ", true, true);

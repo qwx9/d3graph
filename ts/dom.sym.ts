@@ -2,14 +2,19 @@ class SymElem{
 	readonly sym: Sym;
 	readonly isobj: boolean;
 	readonly span: HTMLSpanElement;
-	readonly label: HTMLSpanElement;
 	readonly value: HTMLSpanElement;
 
 	constructor(sym: Sym){
 		this.sym = sym;
 		this.isobj = sym.rule.val instanceof RObj;
 		this.span = addspan(sym.parent.el.value, null);
-		this.label = addspan(this.span, sym.rule.sym);
+		/* domvis-specific: must avoid duplicating control for root element
+		 * here for root sym, and also in dom.val.ts */
+		if(sym.parent instanceof Expr){
+			this.value = addspan(this.span);
+			return this;
+		}
+		addspan(this.span, sym.rule.sym);
 		if(sym.val === null){
 			this.value = addspan(this.span);
 			return this;
