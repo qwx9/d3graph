@@ -24,7 +24,7 @@ class SymElem{
 		this.value = addspan(this.span);
 		if(this.isobj)
 			addspan(this.span, ")");
-		if(!(sym.parent instanceof Expr))
+		if(!(sym.parent.parent instanceof Expr))
 			addbutton(this.span, "x", () => {
 				this.sym.pop();
 			});

@@ -1,4 +1,3 @@
-- reselect + bare options no longer works, should be parm=val, not parm(val)
 - types for one/once/any
 	* ROne, ROnce, RAny in place of RObj, RSelect, etc
 	* used to disable existing params in dom
@@ -7,7 +6,6 @@
 	* RVerbatim?
 	* example → other tree params
 - implement top-level options and alpha/seq/tree-specific options
-	* need to decouple sym from label more, as well as numbering
 - RPtr type or similar and separate tables
 	* like RRef, not included in compilation, just a indirection/dereferenciation
 	* maybe RRef == RPtr? but it's for rules, not values
@@ -86,6 +84,7 @@
 		tree=2, rate=1, etc.
 - documentation, links towards
 	* note: as stateless as possible (which also means redundancies)
+	* root elements are treated differently and full of exceptions...
 
 
 - frequency set: must select one (default), can't just dangle
