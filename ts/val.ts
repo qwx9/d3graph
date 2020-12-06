@@ -222,9 +222,15 @@ abstract class VMulti implements Value{
 		this.rules = r.rules as Rule[];
 		this.parms = {};
 	}
-	compile(){
-		let s = "(";
+	compile(): string{
 		const k = Object.keys(this.parms);
+		/* FIXME: kludge */
+		if(this instanceof VSelect || this.sym.parent instanceof Expr){
+			if(k.length > 1)
+				fatal(this.sym.ref() + ": select instanciated with multiple values");
+			return k.length == 0 ? "" : "=" + this.parms[k[0]].compile();
+		}
+		let s = "(";
 		for(let i=0; i<k.length; i++){
 			s += this.parms[k[i]].compile();
 			if(i < k.length - 1)

@@ -32,7 +32,7 @@
 	* multiple and exclusive values: combination of phyl or proc + data
 		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
 - valid bpp output
-- file upload: rename file when sending to server
+
 - output ui result and edit prior to submit ⇒ textarea
 	* manually upload bpp file ⇒ load into text area
 	* then submit as is

@@ -27,7 +27,11 @@ class Sym{
 		this.val!.set(val);
 	}
 	compile(): string{
-		return this.rule.sym + (this.val === null ? "" : this.val.compile());
+		if(this.parent instanceof Expr)
+			return this.parent.ref() + (this.val === null ? "" : this.val.compile());
+		else
+			return this.rule.sym + (this.val === null ? "" : this.val.compile());
+		//return this.rule.sym + (this.val === null ? "" : this.val.compile());
 	}
 	pop(){
 		if(this.parentval !== null)

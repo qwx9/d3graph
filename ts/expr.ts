@@ -4,11 +4,12 @@ class Expr{
 	id: string;
 	sym: Sym;
 
-	constructor(option: BppOpt, rule: Rule, id: string){
+	constructor(option: BppOpt, i: number, id: string){
 		this.option = option;
 		this.id = id;
 		this.el = new ExprElem(this);
-		this.sym = new Sym(this, rule);
+		this.sym = new Sym(this, option.rule);
+		this.sym.set(i);
 	}
 	setid(id: string){
 		this.id = id;
@@ -22,7 +23,8 @@ class Expr{
 		return this.option.rule.sym + this.id;
 	}
 	compile(): string{
-		return this.ref() + " = " + this.sym.compile();
+		//return this.ref() + " = " + this.sym.compile();
+		return this.sym.compile();
 	}
 	pop(){
 		this.option.pop(this);
