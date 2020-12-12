@@ -1,8 +1,13 @@
+/* judicious use of inheritance would simplify a lot of the copypasta and
+ * enforce more rules when implementing a new Value type
+ */
 interface Value{
 	readonly sym: Sym;
+	val: any;
 	set(val: any): boolean;
 	compile(): string;
 	pop(): void;
+	popchild?(sym: Sym): void;
 }
 
 class VBool implements Value{
@@ -157,47 +162,234 @@ class VFile implements Value{
 		return true;
 	}
 	compile(){
-		if(this.val !== "")
+		if(this.sym.parent instanceof BppOpt)
+			fatal(this.sym.ref() + ": bug: RFile cannot be a root element");
+		else if(this.val !== "")
 			files[this.sym.parent.ref()] = this.el.getfile();
 		return "=" + this.val;
 	}
 	pop(){
-		if(this.val !== "")
+		if(this.sym.parent instanceof BppOpt)
+			fatal(this.sym.ref() + ": bug: RFile cannot be a root element");
+		else if(this.val !== "")
 			delete files[this.sym.parent.ref()];
 		this.el.pop();
 	}
 }
+
+class VAny implements Value{
+	readonly el: VAnyElem;
+	readonly sym: Sym;
+	readonly rules: Rule[];
+	val: Sym[];
+
+	constructor(r: RAny, sym: Sym){
+		this.sym = sym;
+		this.rules = r.rules as Rule[];
+		this.val = [];
+		this.el = new VAnyElem(this);
+	}
+	set(i: number){
+		if(i >= this.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		this.val.push(new Sym(this.sym, this.rules[i]));
+		return true;
+	}
+	compile(){
+		let s: string = "";
+		this.val.forEach((v, i) => {
+			s += this.sym.rule.rsym + (i+1) + "=" + v.compile() + "\n";
+		});
+		return s;
+	}
+	index(sym: Sym){
+		for(let i=0; i<this.val.length; i++)
+			if(this.val[i] === sym)
+				return i;
+		fatal(this.sym.ref() + ": orphaned sym!");
+		return -1;
+	}
+	nuke(){
+		/* assumes .popchild will be called by element itself */
+		while(this.val.length > 1)
+			this.val[0].pop();
+	}
+	popchild(sym: Sym){
+		const i = this.index(sym);
+		this.el.popchild(i);
+		this.val.slice(i, 1);
+	}
+	pop(){
+		this.nuke();
+		this.el.pop();
+	}
+}
+class VOnce implements Value{
+	readonly el: VOnceElem;
+	readonly sym: Sym;
+	readonly rules: Rule[];
+	val: { [name: string]: Sym; };
+
+	constructor(r: ROnce, sym: Sym){
+		this.sym = sym;
+		this.rules = r.rules as Rule[];
+		this.val = {};
+		this.el = new VOnceElem(this);
+	}
+	set(i: number){
+		if(i >= this.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		const r = this.rules[i];
+		if(this.val.hasOwnProperty(r.rsym)){
+			this.val[r.rsym].pop();
+			delete this.val[r.rsym];
+		}
+		this.val[r.rsym] = new Sym(this.sym, r);
+		return true;
+	}
+	compile(){
+		let s: string = "";
+		Object.keys(this.val).forEach((k) => {
+			s += this.sym.rule.rsym + "=" + this.val[k].compile() + "\n";
+		});
+		return s;
+	}
+	nuke(){
+		Object.keys(this.val).forEach((k) => {
+			this.val[k].pop();
+		});
+	}
+	popchild(sym: Sym){
+		const rsym = sym.rule.rsym;
+		if(!this.val.hasOwnProperty(rsym))
+			fatal(this.sym.ref() + ".popchild: no such element " + rsym);
+		delete this.val[rsym];
+		this.el.popchild(rsym);
+	}
+	pop(){
+		this.nuke();
+		this.el.pop();
+	}
+}
+class VParam implements Value{
+	readonly el: VParamElem;
+	readonly sym: Sym;
+	readonly rules: Rule[];
+	val: { [name: string]: Sym; };
+
+	constructor(r: RParam, sym: Sym){
+		this.sym = sym;
+		this.rules = r.rules as Rule[];
+		this.val = {};
+		this.el = new VParamElem(this);
+	}
+	set(i: number){
+		if(i >= this.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		const r = this.rules[i];
+		if(this.val.hasOwnProperty(r.rsym)){
+			this.val[r.rsym].pop();
+			delete this.val[r.rsym];
+		}
+		this.val[r.rsym] = new Sym(this.sym, r);
+		return true;
+	}
+	compile(){
+		let s = "(";
+		const k = Object.keys(this.val);
+		for(let i=0; i<k.length; i++){
+			s += this.val[k[i]].compile();
+			if(i < k.length - 1)
+				s += ", ";
+		}
+		return s + ")";
+	}
+	nuke(){
+		Object.keys(this.val).forEach((k) => {
+			this.val[k].pop();
+		});
+	}
+	popchild(sym: Sym){
+		const rsym = sym.rule.rsym;
+		if(!this.val.hasOwnProperty(rsym))
+			fatal(this.sym.ref() + ".popchild: no such element " + rsym);
+		delete this.val[rsym];
+		this.el.popchild(rsym);
+	}
+	pop(){
+		this.nuke();
+		this.el.pop();
+	}
+}
+class VOne implements Value{
+	readonly el: VOneElem;
+	readonly sym: Sym;
+	readonly rules: Rule[];
+	val: Sym | null;
+
+	constructor(r: ROne, sym: Sym){
+		this.sym = sym;
+		this.rules = r.rules as Rule[];
+		this.val = null;
+		this.el = new VOneElem(this);
+	}
+	set(i: number){
+		if(i >= this.rules.length)
+			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+		this.nuke();
+		this.val = new Sym(this.sym, this.rules[i]);
+		return true;
+	}
+	compile(){
+		if(this.val === null)
+			fatal(this.sym.ref() + ": uninitialized value");
+		return "=" + this.val!.compile();
+	}
+	nuke(){
+		if(this.val !== null)
+			this.val.pop();
+	}
+	popchild(sym: Sym){
+		if(this.val !== sym)
+			fatal(this.sym.ref() + ".popchild: no such element " + sym.ref());
+		this.el.popchild();
+		this.val = null;
+	}
+	pop(){
+		this.nuke();
+		this.el.pop();
+	}
+}
+
 class VRef implements Value{
 	readonly el: VRefElem;
 	readonly sym: Sym;
 	readonly rule: Rule;
 	readonly refidx: string;
 	readonly reftab: Sym[];
-	readonly short: boolean;
 	val: Sym | null;
 	ref: Sym | null;
 
 	constructor(r: RRef, sym: Sym){
 		this.sym = sym;
 		this.rule = r.rule;
-		this.refidx = sym.rule.sym;
+		this.refidx = sym.rule.rsym;
 		if(!reftab.hasOwnProperty(this.refidx))
 			reftab[this.refidx] = [];
 		this.reftab = reftab[this.refidx];
-		this.short = r.short;
 		this.val = null;
 		this.ref = null;
 		this.el = new VRefElem(this);
 	}
-	set(val: number | null){
+	set(i: number | null){
 		this.popchild();
-		if(val !== null){
-			if(val >= this.reftab.length)
-				fatal(this.sym.ref() + ".set: index out of bounds: " + val);
-			this.ref = this.reftab[val];
+		if(i !== null){
+			if(i >= this.reftab.length)
+				fatal(this.sym.ref() + ".set: index out of bounds: " + i);
+			this.ref = this.reftab[i];
 		}else{
-			this.val = new Sym(this.sym, this.rule, this);
-			this.reftab.push(this.val as Sym);
+			this.val = new Sym(this.sym, this.rule);
+			this.reftab.push(this.val);
 		}
 		return true;
 	}
@@ -205,10 +397,7 @@ class VRef implements Value{
 		if(this.val !== null)
 			return "=" + this.val.compile();
 		else if(this.ref !== null){
-			if(this.short)
-				return "=" + this.ref!.rootid();
-			else
-				return "=" + this.ref!.ref();
+			return "=" + this.ref.ref();
 		}else{
 			fatal(this.sym.ref() + ": null value");
 			return "";
@@ -220,7 +409,7 @@ class VRef implements Value{
 	}
 	popchild(){
 		if(this.val !== null){
-			this.val!.pop();
+			this.val.pop();
 			for(let i=0; i<this.reftab.length; i++)
 				if(this.reftab[i] == this.sym){
 					this.reftab.splice(i, 1);
@@ -232,85 +421,3 @@ class VRef implements Value{
 		this.ref = null;
 	}
 }
-
-abstract class VMulti implements Value{
-	readonly el!: VMultiElem;
-	readonly sym: Sym;
-	readonly rules: Rule[];
-	parms: { [name: string]: Sym; };
-
-	constructor(r: Ruleval, sym: Sym){
-		this.sym = sym;
-		this.rules = r.rules as Rule[];
-		this.parms = {};
-	}
-	compile(): string{
-		const k = Object.keys(this.parms);
-		/* FIXME: kludge */
-		if(this instanceof VSelect || this.sym.parent instanceof Expr){
-			if(k.length > 1)
-				fatal(this.sym.ref() + ": select instanciated with multiple values");
-			return k.length == 0 ? "" : "=" + this.parms[k[0]].compile();
-		}
-		let s = "(";
-		for(let i=0; i<k.length; i++){
-			s += this.parms[k[i]].compile();
-			if(i < k.length - 1)
-				s += ", ";
-		}
-		return s + ")";
-	}
-	set(i: number){
-		if(i >= this.rules.length)
-			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
-		const parm = this.rules[i];
-		const sym = parm.sym;
-		if(this.parms.hasOwnProperty(sym)){
-			this.parms[sym].pop();
-			delete this.parms[sym];
-		}
-		this.parms[sym] = new Sym(this.sym, parm, this);
-		return true;
-	}
-	nuke(){
-		for(let k in this.parms)
-			this.parms[k].pop();
-	}
-	pop(){
-		this.nuke();
-		this.el.pop();
-	}
-	popchild(sym: Sym){
-		const ssym = sym.rule.sym;
-		if(!this.parms.hasOwnProperty(ssym))
-			fatal(this.sym.ref() + ".pop: no such param " + ssym);
-		delete this.parms[ssym];
-		this.el.popchild(ssym);
-	}
-}
-class VObj extends VMulti{
-	readonly el: VObjElem;
-
-	constructor(r: RObj, sym: Sym){
-		super(r, sym);
-		this.el = new VObjElem(this);
-	}
-}
-type VParentNode = VObj | VRef;
-
-class VSelect extends VMulti{
-	readonly el: VSelectElem;
-
-	constructor(r: RSelect, sym: Sym){
-		super(r, sym);
-		this.el = new VSelectElem(this);
-	}
-	set(i: number){
-		this.nuke();
-		return super.set(i);
-	}
-}
-/*
-class VAlias implements Value{
-}
-*/

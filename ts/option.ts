@@ -2,51 +2,21 @@ class BppOpt{
 	readonly el: BppOptElem;
 	readonly name: string;
 	readonly rule: Rule;
-	readonly rlist: Rule[];
-	readonly update: (() => void) | null;
-	expr: Expr[];
+	readonly rootsym: Sym;
 
-	constructor(name: string, update: (() => void) | null = null){
+	constructor(name: string){
 		this.name = name;
 		this.rule = rules[name];
-		this.rlist = this.rule.val!.rules as Rule[];
-		this.expr = [];
-		this.update = update;
 		this.el = new BppOptElem(this);
+		this.rootsym = new Sym(this, this.rule);
 	}
-	push(i: number){
-		if(i >= this.rlist.length)
-			fatal(this.name + ".push: index out of bounds: " + i);
-		if(this.update !== null)
-			this.update();
-		const id = this.rule.val instanceof RSelect
-			? "" : (this.expr.length + 1).toString();
-		const e = new Expr(this, i, id);
-		this.expr.push(e);
-	}
-	set(i: number){
-		this.nuke();
-		this.push(i);
-	}
-	compile(){
-		let s: string[] = [];
-		this.expr.forEach((e) => {
-			s.push(e.compile());
-		});
-		return s;
-	}
-	nuke(){
-		while(this.expr.length > 0)
-			this.expr[0].pop();
-	}
-	pop(expr: Expr){
-		if(this.rule.val instanceof RSelect){
-			this.expr = [];
-			return;
-		}
-		let i = Number(expr.id) - 1;
-		this.expr.splice(i, 1);
-		for(; i<this.expr.length; i++)
-			this.expr[i].setid((i + 1).toString());
+	compile(): string{
+		if(this.rootsym.val === null
+		|| this.rootsym.val.val === null
+		|| this.rootsym.val.val instanceof Array && this.rootsym.val.val.length === 0
+		|| this.rootsym.val.val instanceof Object && Object.keys(this.rootsym.val.val).length === 0)
+			return "";
+		else
+			return this.rootsym.compile() + "\n";
 	}
 }

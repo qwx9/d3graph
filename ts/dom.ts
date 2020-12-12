@@ -7,7 +7,7 @@ function newelement(type: string, parent: HTMLDivElement | null = null){
 	return e;
 }
 
-function adddiv(parent: HTMLDivElement){
+function adddiv(parent: HTMLElement){
 	const e = newelement("div") as HTMLDivElement;
 	parent.appendChild(e);
 	return e;

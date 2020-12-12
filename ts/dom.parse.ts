@@ -3,13 +3,10 @@ function showerrors(){
 }
 function showcompiled(){
 	const r = document.getElementById("result") as HTMLDivElement;
-	r.innerHTML = "";
 	files = {};
 	const s = compile();
 	showerrors();
-	s.forEach((e) => {
-		r.innerHTML += e + "<br>";
-	});
+	r.innerHTML = s.replace(/\n/g, "<br>");
 	r.innerHTML += "<br>Files:<br>";
 	for(let k in files)
 		r.innerHTML += k + ": " + files[k].files![0].name + "<br>";
@@ -18,7 +15,7 @@ function showcompiled(){
 function submit(){
 	const fd = new FormData();
 	const s = showcompiled();
-	fd.append("bpp", s.join("\n"));
+	fd.append("bpp", s);
 	for(let k in files)
 		fd.append(k, files[k].files![0], k);
 

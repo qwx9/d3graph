@@ -1,33 +1,33 @@
-- types for one/once/any
-	* ROne, ROnce, RAny in place of RObj, RSelect, etc
-	* used to disable existing params in dom
-	* index: depends on whether or not multiple (duplicated) values are allowed
+- val.ts, everywhere on compilation if val is uninitialized
+		FIXME: everywhere → pusherror and stop compilation (save sym too for vis)
+		FIXME: result and error should be the same div
+			error => compilation failed message + ref
+			success => result
+- types for references: RValueRef, RRuleRef, RTreeRef
+	* no point in complexifying types, just make new ones
+	* way to add an update function to fix state when changing RRuleRef/RTreeRef
+		. RTreeRef optional update() arg?
 - implement top-level options and alpha/seq/tree-specific options
-- RPtr type or similar and separate tables
-	* like RRef, not included in compilation, just a indirection/dereferenciation
-	* maybe RRef == RPtr? but it's for rules, not values
-		- RRuleRef?
-- fix param references/RRef
-	* skip RRef name in compilation
-	* reference actually refers to model rule name, not model index
-	⇒ two types of RRef? indexed and non-indexed?
-	* only indexed refs are tree roots → model1,2,3 tree1,2,3 seq1,2,3
-		- therefore no need
-- referencing indexed elements ≠ their params → phyl, etc
-- implement list based on predicate (model list based on alphabet)
-	* multiple rule tables and refs between them
-	* distribution table, model tables by type
-	* refs to trees of rules, mutable or not
-	* these things can be intermixed for more complex situations and weird models
-		- any model with any whatever
-		- so, associative arrays? arrays with all (redundant) possibilities?
-		  array of concatenated sets?
-- references for trees/seqs/models/etc: different type of RRef?
-	* refs are indices, not names
-	* multiple and exclusive values: combination of phyl or proc + data
-		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
-- valid bpp output
+	* generalize to everything actually
+	* instead of checking against duplicating toplevel control,
+	just add blank element and select its value
+	* so top level option: select with just model (or multiple root types), then
+		model1 = [type]
+		and select [type] -> etc.
+⇒ this solves everything
 
+- error checking
+	* while traversing tree → pusherror() if encountering one
+	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
+		- in fact, a lot of that would be handled automatically ⇒ refs
+		- mostly we need to have a phylogeny defined, which in turn requires data and
+		  proc which in turn require ...
+		- and undefined parameters are checked on compile time as well
+	* or keep state around without recalculating anything, but more bug-prone
+	* file paths
+	* files: easy: check on compile-time, emit error if no path
+		e.g. input stuff must have a (non-empty) path= param
+	* can even continue parsing and output any other errors
 - output ui result and edit prior to submit ⇒ textarea
 	* manually upload bpp file ⇒ load into text area
 	* then submit as is
@@ -39,10 +39,34 @@
 	* right pane: onselect, description
 	* hide unused/uninitialized primitives?
 	* do as little css customization as possible
-- error checking
-	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
-	* or keep state around without recalculating anything, but more bug-prone
-	* file paths
+
+
+
+- fix param references/RRef
+	* skip RRef name in compilation
+	* reference actually refers to model rule name, not model index
+	⇒ two types of RRef? indexed and non-indexed?
+	* only indexed refs are tree roots → model1,2,3 tree1,2,3 seq1,2,3
+		- therefore no need
+- referencing indexed elements ≠ their params → phyl, etc
+- references for trees/seqs/models/etc: different type of RRef?
+	* refs are indices, not names
+	* multiple and exclusive values: combination of phyl or proc + data
+		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
+- valid bpp output
+- implement list based on predicate (model list based on alphabet)
+	* multiple rule tables and refs between them
+	* distribution table, model tables by type
+	* refs to trees of rules, mutable or not
+	* these things can be intermixed for more complex situations and weird models
+		- any model with any whatever
+		- so, associative arrays? arrays with all (redundant) possibilities?
+		  array of concatenated sets?
+- RPtr type or similar and separate tables
+	* like RRef, not included in compilation, just a indirection/dereferenciation
+	* maybe RRef == RPtr? but it's for rules, not values
+		- RRuleRef?
+
 
 
 

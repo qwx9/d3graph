@@ -1,6 +1,6 @@
 function compile(){
-	let s: string[] = [];
+	let s: string = "";
 	for(let k in options)
-		s = [...s, ...options[k].compile()];
+		s += options[k].compile();
 	return s;
 }

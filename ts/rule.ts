@@ -67,46 +67,64 @@ class RFile implements Ruleval{
 		return new VFile(this, sym);
 	}
 }
+class RAny implements Ruleval{
+	readonly rules: Rule[];
+
+	constructor(rules: Rule[]){
+		this.rules = rules;
+	}
+	putval(sym: Sym): Value{
+		return new VAny(this, sym);
+	}
+}
+class ROnce implements Ruleval{
+	readonly rules: Rule[];
+
+	constructor(rules: Rule[]){
+		this.rules = rules;
+	}
+	putval(sym: Sym): Value{
+		return new VOnce(this, sym);
+	}
+}
+class RParam implements Ruleval{
+	readonly rules: Rule[];
+
+	constructor(rules: Rule[]){
+		this.rules = rules;
+	}
+	putval(sym: Sym): Value{
+		return new VParam(this, sym);
+	}
+}
+class ROne implements Ruleval{
+	readonly rules: Rule[];
+
+	constructor(rules: Rule[]){
+		this.rules = rules;
+	}
+	putval(sym: Sym): Value{
+		return new VOne(this, sym);
+	}
+}
 class RRef implements Ruleval{
 	readonly rule: Rule;
-	readonly short: boolean;
 
-	constructor(short: boolean, rule: Rule){
-		this.short = short;
+	constructor(rule: Rule){
 		this.rule = rule;
 	}
 	putval(sym: Sym): Value{
 		return new VRef(this, sym);
 	}
 }
-class RObj implements Ruleval{
-	readonly rules: Rule[];
-
-	constructor(rules: Rule[]){
-		this.rules = rules;
-	}
-	putval(sym: Sym): Value{
-		return new VObj(this, sym);
-	}
-}
-class RSelect implements Ruleval{
-	readonly rules: Rule[];
-
-	constructor(rules: Rule[]){
-		this.rules = rules;
-	}
-	putval(sym: Sym): Value{
-		return new VSelect(this, sym);
-	}
-}
 class Rule{
 	readonly label: string;
-	readonly sym: string;
+	readonly rsym: string;
 	readonly val: Ruleval | null;
 
-	constructor(label: string, sym: string, val: Ruleval | null = null){
+	constructor(label: string, rsym: string, val: Ruleval | null = null){
 		this.label = label;
-		this.sym = sym;
+		this.rsym = rsym;
 		this.val = val;
 	}
 	putval(sym: Sym): Value{
