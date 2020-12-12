@@ -14,9 +14,9 @@ class RBool implements Ruleval{
 	}
 }
 class RInteger implements Ruleval{
-	readonly def: number;
+	readonly def: number | null;
 
-	constructor(def: number = 0){
+	constructor(def: number | null = null){
 		this.def = def;
 	}
 	putval(sym: Sym): Value{
@@ -24,9 +24,9 @@ class RInteger implements Ruleval{
 	}
 }
 class RPropor implements Ruleval{
-	readonly def: number;
+	readonly def: number | null;
 
-	constructor(def: number = 0){
+	constructor(def: number | null = null){
 		this.def = def;
 	}
 	putval(sym: Sym): Value{
@@ -34,9 +34,9 @@ class RPropor implements Ruleval{
 	}
 }
 class RFloat implements Ruleval{
-	readonly def: number;
+	readonly def: number | null;
 
-	constructor(def: number = 0){
+	constructor(def: number | null = null){
 		this.def = def;
 	}
 	putval(sym: Sym): Value{
@@ -44,9 +44,9 @@ class RFloat implements Ruleval{
 	}
 }
 class RString implements Ruleval{
-	readonly def: string;
+	readonly def: string | null;
 
-	constructor(def: string = ""){
+	constructor(def: string | null = null){
 		this.def = def;
 	}
 	putval(sym: Sym): Value{

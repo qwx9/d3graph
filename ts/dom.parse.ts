@@ -1,20 +1,36 @@
 function showerrors(){
-	//document.getElementById("errors")!.textContent = "No errors.";
+	if(errors.length < 1)
+		return;
+	const r = document.getElementById("result") as HTMLDivElement;
+	r.innerHTML = "";
+	addspan(r, "Errors:");
+	errors.forEach((e) => {
+		const d = adddiv(r);
+		addspan(d, e.err);
+		(e.val);
+	});
 }
 function showcompiled(){
-	const r = document.getElementById("result") as HTMLDivElement;
-	files = {};
 	const s = compile();
-	showerrors();
-	r.innerHTML = s.replace(/\n/g, "<br>");
-	r.innerHTML += "<br>Files:<br>";
+	if(s === "" || errors.length > 0){
+		showerrors();
+		return "";
+	}
+	const r = document.getElementById("result") as HTMLDivElement;
+	r.innerHTML = "";
+	addspan(r, "Compilation successful:");
+	const d = adddiv(r);
+	d.innerHTML = s.replace(/\n/g, "<br>");
+	d.innerHTML += "<br>Files:<br>";
 	for(let k in files)
-		r.innerHTML += k + ": " + files[k].files![0].name + "<br>";
+		d.innerHTML += k + ": " + files[k].files![0].name + "<br>";
 	return s;
 }
 function submit(){
 	const fd = new FormData();
 	const s = showcompiled();
+	if(s === "")
+		return;
 	fd.append("bpp", s);
 	for(let k in files)
 		fd.append(k, files[k].files![0], k);

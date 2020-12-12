@@ -1,4 +1,3 @@
-let reftab: { [name: string]: Sym[] } = {};
 const rules: { [name: string]: Rule } = {
 	"alphabet": new Rule("Alphabet", "alphabet", new ROne([
 		new Rule("DNA", "DNA"),
@@ -146,7 +145,6 @@ const rules: { [name: string]: Rule } = {
 	"phyl": new Rule("Phylogeny", "phyl", new RAny([
 	])),
 };
-let refeltab: { [name: string]: VRefElem[] } = {};
 const options: { [name: string]: BppOpt } = {
 	"alphabet": new BppOpt("alphabet"),
 	"gencode": new BppOpt("gencode"),
@@ -158,6 +156,9 @@ const options: { [name: string]: BppOpt } = {
 	"proc": new BppOpt("proc"),
 	"phyl": new BppOpt("phyl"),
 };
+let reftab: { [name: string]: Sym[] } = {};
+let refeltab: { [name: string]: VRefElem[] } = {};
 let files: { [index: string]: HTMLInputElement } = {};
+let errors: {err:string, val:Value}[] = [];
 
 registersubmit();

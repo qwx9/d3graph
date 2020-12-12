@@ -1,6 +1,9 @@
 /* judicious use of inheritance would simplify a lot of the copypasta and
  * enforce more rules when implementing a new Value type
  */
+/* contorsions are sometimes required to avoid silly typescript annoyances,
+ * especially for union types
+ */
 interface Value{
 	readonly sym: Sym;
 	val: any;
@@ -35,11 +38,10 @@ class VBool implements Value{
 class VInteger implements Value{
 	readonly el: VIntegerElem;
 	readonly sym: Sym;
-	val: number;
+	val: number | null;
 
 	constructor(r: RInteger, sym: Sym){
-		this.val = 0;
-		this.set(r.def);
+		this.val = r.def;
 		this.sym = sym;
 		this.el = new VIntegerElem(this);
 	}
@@ -48,6 +50,10 @@ class VInteger implements Value{
 		return true;
 	}
 	compile(){
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
 		return "=" + this.val.toString();
 	}
 	pop(){
@@ -57,11 +63,10 @@ class VInteger implements Value{
 class VPropor implements Value{
 	readonly el: VProporElem;
 	readonly sym: Sym;
-	val: number;
+	val: number | null;
 
 	constructor(r: RPropor, sym: Sym){
-		this.val = 0;
-		this.set(r.def);
+		this.val = r.def;
 		this.sym = sym;
 		this.el = new VProporElem(this);
 	}
@@ -72,6 +77,10 @@ class VPropor implements Value{
 		return true;
 	}
 	compile(){
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
 		return "=" + this.val.toString();
 	}
 	pop(){
@@ -81,11 +90,10 @@ class VPropor implements Value{
 class VFloat implements Value{
 	readonly el: VFloatElem;
 	readonly sym: Sym;
-	val: number;
+	val: number | null;
 
 	constructor(r: RFloat, sym: Sym){
-		this.val = 0;
-		this.set(r.def);
+		this.val = r.def;
 		this.sym = sym;
 		this.el = new VFloatElem(this);
 	}
@@ -96,6 +104,10 @@ class VFloat implements Value{
 		return true;
 	}
 	compile(){
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
 		return "=" + this.val.toString();
 	}
 	pop(){
@@ -105,11 +117,10 @@ class VFloat implements Value{
 class VString implements Value{
 	readonly el: VStringElem;
 	readonly sym: Sym;
-	val: string;
+	val: string | null;
 
 	constructor(r: RString, sym: Sym){
-		this.val = "";
-		this.set(r.def);
+		this.val = r.def;
 		this.sym = sym;
 		this.el = new VStringElem(this);
 	}
@@ -118,6 +129,10 @@ class VString implements Value{
 		return true;
 	}
 	compile(){
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
 		return "=" + this.val;
 	}
 	pop(){
@@ -127,7 +142,7 @@ class VString implements Value{
 class VVerbatim implements Value{
 	readonly el: VVerbatimElem;
 	readonly sym: Sym;
-	val: string;
+	val: string | null;
 
 	constructor(r: RVerbatim, sym: Sym){
 		(r);
@@ -140,6 +155,10 @@ class VVerbatim implements Value{
 		return true;
 	}
 	compile(){
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
 		return this.val;
 	}
 	pop(){
@@ -149,11 +168,11 @@ class VVerbatim implements Value{
 class VFile implements Value{
 	readonly el: VFileElem;
 	readonly sym: Sym;
-	val: string;
+	val: string | null;
 
 	constructor(r: RFile, sym: Sym){
 		(r);
-		this.val = "";
+		this.val = null;
 		this.sym = sym;
 		this.el = new VFileElem(this);
 	}
@@ -162,10 +181,14 @@ class VFile implements Value{
 		return true;
 	}
 	compile(){
-		if(this.sym.parent instanceof BppOpt)
+		if(this.sym.parent instanceof BppOpt){
 			fatal(this.sym.ref() + ": bug: RFile cannot be a root element");
-		else if(this.val !== "")
-			files[this.sym.parent.ref()] = this.el.getfile();
+			return "";
+		}else if(this.val === null || this.val === ""){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
+		files[this.sym.parent.ref()] = this.el.getfile();
 		return "=" + this.val;
 	}
 	pop(){
@@ -341,8 +364,10 @@ class VOne implements Value{
 		return true;
 	}
 	compile(){
-		if(this.val === null)
-			fatal(this.sym.ref() + ": uninitialized value");
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
 		return "=" + this.val!.compile();
 	}
 	nuke(){
@@ -399,8 +424,8 @@ class VRef implements Value{
 		else if(this.ref !== null){
 			return "=" + this.ref.ref();
 		}else{
-			fatal(this.sym.ref() + ": null value");
-			return "";
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
 		}
 	}
 	pop(){

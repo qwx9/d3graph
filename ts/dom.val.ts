@@ -26,9 +26,9 @@ class VIntegerElem{
 		this.val = val;
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
-		this.text = addtext(this.span, this.val.val.toString(), () => {
+		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(parseInt(this.text.value)))
-				this.text.value = this.val.val.toString();
+				this.text.value = this.val.val!.toString();
 		});
 	}
 	pop(){
@@ -45,9 +45,9 @@ class VProporElem{
 		this.val = val;
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
-		this.text = addtext(this.span, this.val.val.toString(), () => {
+		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(parseFloat(this.text.value)))
-				this.text.value = this.val.val.toString();
+				this.text.value = this.val.val!.toString();
 		});
 	}
 	pop(){
@@ -64,9 +64,9 @@ class VFloatElem{
 		this.val = val;
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
-		this.text = addtext(this.span, this.val.val.toString(), () => {
+		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(parseFloat(this.text.value)))
-				this.text.value = this.val.val.toString();
+				this.text.value = this.val.val!.toString();
 		});
 	}
 	pop(){
@@ -83,9 +83,9 @@ class VStringElem{
 		this.val = val;
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
-		this.text = addtext(this.span, this.val.val.toString(), () => {
+		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(this.text.value))
-				this.text.value = this.val.val;
+				this.text.value = this.val.val!;
 		});
 	}
 	pop(){
@@ -102,9 +102,9 @@ class VVerbatimElem{
 		this.val = val;
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
-		this.text = addtext(this.span, this.val.val.toString(), () => {
+		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(this.text.value))
-				this.text.value = this.val.val;
+				this.text.value = this.val.val!;
 		});
 	}
 	pop(){
