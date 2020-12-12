@@ -1,33 +1,26 @@
-- val.ts, everywhere on compilation if val is uninitialized
-		FIXME: everywhere → pusherror and stop compilation (save sym too for vis)
-		FIXME: result and error should be the same div
-			error => compilation failed message + ref
-			success => result
 - types for references: RValueRef, RRuleRef, RTreeRef
 	* no point in complexifying types, just make new ones
 	* way to add an update function to fix state when changing RRuleRef/RTreeRef
 		. RTreeRef optional update() arg?
-- implement top-level options and alpha/seq/tree-specific options
-	* generalize to everything actually
-	* instead of checking against duplicating toplevel control,
-	just add blank element and select its value
-	* so top level option: select with just model (or multiple root types), then
-		model1 = [type]
-		and select [type] -> etc.
+- add root, rate, proc, phyl
+	* multiple and exclusive values: combination of phyl or proc + data
+		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
 ⇒ this solves everything
+- check valid bpp output
+- implement list based on predicate (model list based on alphabet)
+	* multiple rule tables and refs between them
+	* distribution table, model tables by type
+	* refs to trees of rules, mutable or not
+	* these things can be intermixed for more complex situations and weird models
+		- any model with any whatever
+		- so, associative arrays? arrays with all (redundant) possibilities?
+		  array of concatenated sets?
 
 - error checking
-	* while traversing tree → pusherror() if encountering one
-	* either traverse the trees on submit, generate constraints and remove those met on the fly, then emit those that remain
-		- in fact, a lot of that would be handled automatically ⇒ refs
-		- mostly we need to have a phylogeny defined, which in turn requires data and
-		  proc which in turn require ...
-		- and undefined parameters are checked on compile time as well
-	* or keep state around without recalculating anything, but more bug-prone
-	* file paths
-	* files: easy: check on compile-time, emit error if no path
-		e.g. input stuff must have a (non-empty) path= param
-	* can even continue parsing and output any other errors
+	* must have one phylogeny defined
+		- which in turn implies model, data, etc
+	* input stuff must have a (non-empty) path= param
+- add fourre-tout toplevel options
 - output ui result and edit prior to submit ⇒ textarea
 	* manually upload bpp file ⇒ load into text area
 	* then submit as is
@@ -39,67 +32,17 @@
 	* right pane: onselect, description
 	* hide unused/uninitialized primitives?
 	* do as little css customization as possible
+	* file input shit sucks
 
 
-
-- fix param references/RRef
-	* skip RRef name in compilation
-	* reference actually refers to model rule name, not model index
-	⇒ two types of RRef? indexed and non-indexed?
-	* only indexed refs are tree roots → model1,2,3 tree1,2,3 seq1,2,3
-		- therefore no need
-- referencing indexed elements ≠ their params → phyl, etc
-- references for trees/seqs/models/etc: different type of RRef?
-	* refs are indices, not names
-	* multiple and exclusive values: combination of phyl or proc + data
-		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
-- valid bpp output
-- implement list based on predicate (model list based on alphabet)
-	* multiple rule tables and refs between them
-	* distribution table, model tables by type
-	* refs to trees of rules, mutable or not
-	* these things can be intermixed for more complex situations and weird models
-		- any model with any whatever
-		- so, associative arrays? arrays with all (redundant) possibilities?
-		  array of concatenated sets?
-- RPtr type or similar and separate tables
-	* like RRef, not included in compilation, just a indirection/dereferenciation
-	* maybe RRef == RPtr? but it's for rules, not values
-		- RRuleRef?
-
-
-
-
-- exceptions for sym.parent or sym.parent.parent instanceof Expr all over the place
-	* find a better and less bugprone way
 - val.ts: ValueElem .el in interface and add standard .set() and .pop()/.nuke()/etc
 
-- ref sym ref's need to skip the actual ref element, so does compilation
 
-
-- bppml specific options
+- more stuff + bppml specific options
 - aliases
 	* forward/backward aliases?
 
 
-
-
-- customize file input shit
-	* button/text area both clickable, etc: combine if possible
-	* file type?
-- dom.val: paren management is fucked
-- select/list on root, should behave same as anywhere else
-- add terminal list option → has its own [x], shouldn't
-- maybe we don't even need to save any dom state in the dom objects, besides container
-- VString: check if string is admissible/valid
-	* is this even used anywhere? check (i/o params etc)
-- required arguments? -> auto add
-- add a way to name and reference tree nodes
-	. default names, or indices from files?
-	. no error checking since we can't parse tree anyway
-	. just always use indices for nodes?
-	. user could specify tree shape?
-	⇒ no parsing, user does this manually, fuck it
 - variable naming in bpp: model1-2-3: model1 parameter _1, see how shit is automatically named
 	. important for references
 	. HKY85.kappa_1, not model1.kappa
@@ -108,12 +51,3 @@
 - documentation, links towards
 	* note: as stateless as possible (which also means redundancies)
 	* root elements are treated differently and full of exceptions...
-
-
-- frequency set: must select one (default), can't just dangle
-- if there's an error on input which bppml detects immediately:
-	. show query page with same parametrization and error messages
-	. allow basically recompiling the config and sending new files
-		* or keeping old otherwise
-- implement all options from bpp manual
-- index1, index2: accessoire
