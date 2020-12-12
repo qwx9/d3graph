@@ -7,7 +7,7 @@ class VBoolElem{
 	constructor(val: VBool){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, "=");
 		this.check = addcheckbox(this.span, this.val.val, () => {
 			this.val.set(this.check.checked);
 		});
@@ -25,7 +25,7 @@ class VIntegerElem{
 	constructor(val: VInteger){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, "=");
 		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(parseInt(this.text.value)))
 				this.text.value = this.val.val!.toString();
@@ -44,7 +44,7 @@ class VProporElem{
 	constructor(val: VPropor){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, "=");
 		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(parseFloat(this.text.value)))
 				this.text.value = this.val.val!.toString();
@@ -63,7 +63,7 @@ class VFloatElem{
 	constructor(val: VFloat){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, "=");
 		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(parseFloat(this.text.value)))
 				this.text.value = this.val.val!.toString();
@@ -82,7 +82,7 @@ class VStringElem{
 	constructor(val: VString){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, "=");
 		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(this.text.value))
 				this.text.value = this.val.val!;
@@ -101,7 +101,7 @@ class VVerbatimElem{
 	constructor(val: VVerbatim){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, "=");
 		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
 			if(this.val.set(this.text.value))
 				this.text.value = this.val.val!;
@@ -120,8 +120,8 @@ class VFileElem{
 	constructor(val: VFile){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
-		this.file = addfile(this.sym.parent.el.value, () => {
+		this.span = addspan(val.sym.el.value, "=");
+		this.file = addfile(this.span, () => {
 			this.val.set(this.file.files![0].name);
 		});
 	}
@@ -143,7 +143,7 @@ class VAnyElem{
 	constructor(val: VAny){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, this.sym.parent instanceof BppOpt ? null : "=");
 		this.selval = [];
 		if(val.rules.length > 0){
 			this.select = addselectfn(this.span, (e) => {
@@ -162,7 +162,7 @@ class VAnyElem{
 		this.select!.selectedIndex = 0;
 	}
 	popchild(i: number){
-		this.selval.slice(i, 1);
+		this.selval.splice(i, 1);
 	}
 	pop(){
 		this.span.remove();
@@ -178,7 +178,7 @@ class VOnceElem{
 	constructor(val: VOnce){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, this.sym.parent instanceof BppOpt ? null : "=");
 		this.selval = {};
 		if(val.rules.length > 0){
 			this.select = addselectfn(this.span, (e) => {
@@ -211,13 +211,13 @@ class VParamElem{
 	readonly sym: Sym;
 	readonly span: HTMLSpanElement;
 	readonly select?: HTMLSelectElement;
-	selval: { [name: string]: {o:HTMLOptionElement, s:HTMLSpanElement | null} };
+	selval: {rs:string, o:HTMLOptionElement, com:HTMLSpanElement | null}[];
 
 	constructor(val: VParam){
 		this.val = val;
 		this.sym = val.sym;
 		this.span = addspan(val.sym.el.value);
-		this.selval = {};
+		this.selval = [];
 		if(val.rules.length > 0){
 			this.select = addselectfn(this.span, (e) => {
 				addoption(e, " -- ", true, true);
@@ -230,24 +230,35 @@ class VParamElem{
 		}
 	}
 	sel(i: number){
-		let sp = null;
-		if(Object.keys(this.selval).length > 0)
-			sp = addspan(this.span, ", ");
+		let com = null;
+		if(this.selval.length > 0)
+			com = addspan(this.sym.el.value, ", ");
 		if(this.val.set(i-1)){
 			this.select!.options[i].disabled = true;
-			this.selval[this.val.rules[i-1].rsym] = {o:this.select!.options[i], s:sp};
-		}
+			this.selval.push({
+				rs:this.val.rules[i-1].rsym,
+				o:this.select!.options[i],
+				com:com
+			});
+		}else if(com !== null)
+			com.remove();
 		this.select!.selectedIndex = 0;
 	}
 	popchild(rsym: string){
-		let {o, s} = this.selval[rsym];
-		o.disabled = false;
-		if(s !== null)
-			s.remove();
-		s = this.span.children[0] as HTMLSpanElement;
-		if(s.textContent === ", ")
-			s.remove();
-		delete this.selval[rsym];
+		for(let i=0; i<this.selval.length; i++){
+			const {rs, o, com} = this.selval[i];
+			if(rs !== rsym)
+				continue;
+			o.disabled = false;
+			if(com !== null)
+				com.remove();
+			this.selval.splice(i, 1);
+			break;
+		}
+		if(this.selval.length > 0 && this.selval[0].com !== null){
+			this.selval[0].com.remove();
+			this.selval[0].com = null;
+		}
 	}
 	pop(){
 		this.span.remove();
@@ -263,7 +274,7 @@ class VOneElem{
 	constructor(val: VOne){
 		this.val = val;
 		this.sym = val.sym;
-		this.span = addspan(val.sym.el.value);
+		this.span = addspan(val.sym.el.value, this.sym.parent instanceof BppOpt ? null : "=");
 		this.selval = null;
 		if(val.rules.length > 0){
 			this.select = addselectfn(this.span, (e) => {

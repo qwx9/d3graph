@@ -240,7 +240,7 @@ class VAny implements Value{
 	popchild(sym: Sym){
 		const i = this.index(sym);
 		this.el.popchild(i);
-		this.val.slice(i, 1);
+		this.val.splice(i, 1);
 	}
 	pop(){
 		this.nuke();

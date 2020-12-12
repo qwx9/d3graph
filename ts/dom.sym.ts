@@ -14,7 +14,7 @@ class SymElem{
 			this.value = addspan(this.span);
 			return this;
 		}
-		const multiple = this.sym.val instanceof VParam;
+		const multiple = this.sym.rule.val instanceof RParam;
 		if(multiple)
 			addspan(this.span, "(");
 		this.value = addspan(this.span);
