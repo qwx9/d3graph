@@ -92,6 +92,43 @@ class VStringElem{
 		this.span.remove();
 	}
 }
+/*
+class VVectorElem{
+	readonly val: VVector;
+	readonly sym: Sym;
+	readonly span: HTMLSpanElement;
+	text: HTMLInputElement[];
+
+	constructor(val: VVector){
+		this.val = val;
+		this.sym = val.sym;
+		this.span = addspan(val.sym.el.value, val.dim > 1 ? "=(" : "=");
+		this.text = [];
+		for(let i=0; i<val.dim; i++){
+			this.text[i] = addtext(this.span, "", () => {
+				let a = [];
+				if(this.text.value !== ""){
+					a = this.text.value.split(",").map(x => parseInt(x, 10));
+					for(let k=0; k<a.length; k++)
+						if(isNaN(a[k])){
+							const s = this.text[i].value;
+							this.text[i].value = "";
+							this.val[i] = [];
+							fatal(this.sym.ref() + ": invalid number string: " + s);
+						}
+				}
+				if(this.val.set(i, a))
+					this.text[i].value = this.val[i].toString();
+			});		
+		}
+		if(val.dim > 1)
+			addspan(val.sym.el.value, ")");
+	}
+	pop(){
+		this.span.remove();
+	}
+}
+*/
 class VVerbatimElem{
 	readonly val: VVerbatim;
 	readonly sym: Sym;
@@ -304,73 +341,126 @@ class VOneElem{
 class VRefElem{
 	readonly val: VRef;
 	readonly sym: Sym;
-	readonly refeltab: VRefElem[];
+	readonly ref: Ref;
 	readonly span: HTMLSpanElement;
 	readonly select: HTMLSelectElement;
+	opts: {s:Sym, o:HTMLOptionElement}[];
 
 	constructor(val: VRef){
 		this.val = val;
 		this.sym = val.sym;
-		if(!refeltab.hasOwnProperty(val.refidx))
-			refeltab[val.refidx] = [];
-		this.refeltab = refeltab[val.refidx];
-		this.refeltab.push(this);
+		this.ref = val.rref.ref;
 		this.span = addspan(val.sym.el.value);
+		this.opts = [];
 		this.select = addselectfn(this.span, (e) => {
 			addoption(e, " -- ", true, true);
 			addoption(e, " new value ");
-			this.val.reftab.forEach((s) => {
-				addoption(e, s!.ref());
+			this.val.rref.ref.syms.forEach((s) => {
+				if(s !== this.sym){
+					const o = addoption(e, s.ref());
+					this.opts.push({s:s, o:o});
+				}
 			});
 		}, () => {
-				this.sel(this.select!.selectedIndex);
+			this.sel(this.select.selectedIndex);
 		});
 	}
 	sel(i: number){
-		if(i == 1){
-			this.val.set(null);
-			this.update(false);
-		/* val.set calls this.popchild→this.update itself */
-		}else
-			this.val.set(i - 2);
+		if(i == 1)
+			this.val.nuke();
+		else if(i == 2)
+			this.val.pushval();
+		else
+			this.val.set(this.opts[i-2].s);
 	}
-	update(fixidx: boolean){
-		const sym = this.val.val as Sym;
-		const reftab = this.val.reftab;
-		for(let i=0; i<this.refeltab.length; i++){
-			let e = this.refeltab[i];
-			if(e !== this)
-				continue;
-			if(fixidx){
-				for(let i=0, opi=2; i<reftab.length; i++){
-					if(reftab[i] === this.val.sym){
-						e.select.options[opi].remove();
-						if(e.select.selectedIndex == opi){
-							e.val.val = null;
-							e.select.selectedIndex = 0;
-						}else if(e.select.selectedIndex > opi)
-							e.select.selectedIndex--;
-					}else if(reftab[i] !== e.val.sym){
-						const ref = e.val.sym!.ref();
-						e.select.options[opi].value = ref;
-						e.select.options[opi].textContent = ref;
-						opi++;
-					}
-				}
-			}else
-				addoption(e.select, sym.ref());
-		}
+	addsymref(sym: Sym){
+		const o = addoption(this.select, sym.ref());
+		this.opts.push({s:sym, o:o});
+	}
+	removesymref(sym: Sym){
+		let i;
+		for(i=0; i<this.opts.length; i++)
+			if(this.opts[i].s == sym)
+				break;
+		if(i === this.opts.length)
+			fatal(this.sym.ref() + ".removesymref: phase error: remove sym not found");
+		this.opts[i].o.remove();
+		this.opts.splice(i, 1);
+		const s = this.select;
+		if(s.selectedIndex === i){
+			this.val.nuke();
+			s.selectedIndex = 0;
+		}else if(s.selectedIndex > i)
+			s.selectedIndex--;
+		this.opts.forEach((o) => {
+			const sref = o.s.ref();
+			o.o.textContent = sref;
+			o.o.value = sref;
+		});
+	}
+	popchild(sym: Sym){
+		(sym);
 	}
 	pop(){
-		/* val.pop calls this.popchild→this.update itself */
-		for(let i=0; i<this.refeltab.length; i++)
-			if(this.refeltab[i] == this){
-				this.refeltab.splice(i, 1);
-				break;
-			}
 		this.span.remove();
 	}
-	popchild(){
-		this.update(true);
-	}
 };
+class VAnyRefElem{
+	readonly val: VAnyRef;
+	readonly sym: Sym;
+	readonly span: HTMLSpanElement;
+	readonly select: HTMLSelectElement;
+	opts: {s:Sym, o:HTMLOptionElement}[];
+
+	constructor(val: VAnyRef){
+		this.val = val;
+		this.sym = val.sym;
+		this.span = addspan(val.sym.el.value);
+		this.opts = [];
+		this.select = addselectfn(this.span, (e) => {
+			addoption(e, " -- ", true, true);
+			this.val.rref.ref.syms.forEach((s) => {
+				if(s !== this.sym){
+					const o = addoption(e, s.ref());
+					this.opts.push({s:s, o:o});
+				}
+			});
+		}, () => {
+			this.sel(this.select.selectedIndex);
+		});
+	}
+	sel(i: number){
+		this.val.set(this.opts[i-1].s);
+	}
+	addsymref(sym: Sym){
+		const o = addoption(this.select, sym.ref());
+		this.opts.push({s:sym, o:o});
+	}
+	removesymref(sym: Sym){
+		let i;
+		for(i=0; i<this.opts.length; i++)
+			if(this.opts[i].s == sym)
+				break;
+		if(i === this.opts.length)
+			fatal(this.sym.ref() + ".removesymref: phase error: remove sym not found");
+		this.opts[i].o.remove();
+		this.opts.splice(i, 1);
+		const s = this.select;
+		if(s.selectedIndex === i){
+			this.val.nuke();
+			s.selectedIndex = 0;
+		}else if(s.selectedIndex > i)
+			s.selectedIndex--;
+		this.opts.forEach((o) => {
+			const sref = o.s.ref();
+			o.o.textContent = sref;
+			o.o.value = sref;
+		});
+	}
+	popchild(sym: Sym){
+		(sym);
+	}
+	pop(){
+		this.span.remove();
+	}
+}

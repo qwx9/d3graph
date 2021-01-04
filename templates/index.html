@@ -4,16 +4,23 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>query</title>
-	<style src="{{ url_for('static', filename='style.css') }}"></style>
+	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='optionalStyles.css') }}">
 	<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
+<header id="header">Bio++ query</header>
 <body>
- 	<div id="root"></div>
+	<h1>bbpml query</h1>
+	<div id="root" class="col-lg-12"></div>
 	<br>
-	<div id="result"></div>
+	<div class="col-lg-12" style="background: #80ad9a"><br></div>
 	<br>
-	Server response:
-	<div id="response"></div>
+	<div id="buttons" class="col-lg-12"></div>
 	<br>
+	<div id="result" class="col-lg-12"></div>
 </body>
+<footer id="footer">
+	<p>Referenced software : Bio++, BppSuite, phylotree</p>
+</footer>
 </html>

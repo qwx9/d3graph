@@ -8,6 +8,7 @@ ts/dom.val.ts \
 ts/dom.ts \
 ts/option.ts \
 ts/parse.ts \
+ts/ref.ts \
 ts/rule.ts \
 ts/sym.ts \
 ts/val.ts \

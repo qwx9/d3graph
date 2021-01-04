@@ -1,3 +1,6 @@
+let reftab: { [name: string]: Ref } = {};
+let files: { [index: string]: HTMLInputElement } = {};
+let errors: {err:string, val:Value|BppOpt}[] = [];
 const rules: { [name: string]: Rule } = {
 	"alphabet": new Rule("Alphabet", "alphabet", new ROne([
 		new Rule("DNA", "DNA"),
@@ -19,14 +22,14 @@ const rules: { [name: string]: Rule } = {
 				new Rule("RNA", "RNA"),
 			])),
 		])),
-	])),
+	]), true),
 	"gencode": new Rule("Genetic code", "genetic_code", new ROne([
 		new Rule("Standard (1)", "Standard"),
 		new Rule("VertebrateMitochondrial (2)", "VertebrateMitochondrial"),
 	])),
 	"seq": new Rule("Sequence data", "input.data", new RAny([
 		new Rule("Aligned sequence", "alignment", new RParam([
-			new Rule("Path", "path", new RFile()),
+			new Rule("File", "file", new RFile(), true),
 			new Rule("Format", "format", new ROne([
 				new Rule("Fasta", "Fasta", new RParam([
 					new Rule("extended", "extended", new RBool()),
@@ -58,7 +61,7 @@ const rules: { [name: string]: Rule } = {
 				])),
 				new Rule("Genbank", "Genbank", new RParam([
 				])),
-			])),
+			]), true),
 		])),
 	])),
 	"tree": new Rule("Tree data", "input.tree", new RAny([
@@ -66,83 +69,108 @@ const rules: { [name: string]: Rule } = {
 			new Rule("Leaf data index", "data", new RInteger()),
 		])),
 		new Rule("User tree", "user", new RParam([
-			new Rule("Path", "path", new RFile()),
+			new Rule("File", "file", new RFile(), true),
 			new Rule("Format", "format", new ROne([
 				new Rule("Newick", "Newick"),
 				new Rule("Nexus", "Nexus"),
 				new Rule("NHX", "NHX"),
-			])),
+			]), true),
 			new Rule("Additional options", "", new RVerbatim()),
 		])),
 	])),
 	"model": new Rule("Tree model", "model", new RAny([
 		new Rule("JC69", "JC69", new RParam([])),
 		new Rule("K80", "K80", new RParam([
-			new Rule("kappa", "kappa", new RRef(
-				new Rule("kappa", "kappa", new RFloat())
-			)),
+			new Rule("kappa", "kappa", new RRef("kappa", new Rule("", "", new RFloat()))),
 		])),
 		new Rule("F84", "F84", new RParam([
-			new Rule("kappa", "kappa", new RRef(
-				new Rule("kappa", "kappa", new RFloat())
-			)),
-			new Rule("theta", "theta", new RRef(
-				new Rule("theta", "theta", new RFloat())
-			)),
-			new Rule("theta1", "theta", new RRef(
-				new Rule("theta1", "theta_1", new RFloat())
-			)),
-			new Rule("theta2", "theta", new RRef(
-				new Rule("theta2", "theta_2", new RFloat())
-			)),
+			new Rule("kappa", "kappa", new RRef("kappa", new Rule("", "", new RFloat()))),
+			new Rule("theta", "theta", new RRef("theta", new Rule("", "", new RFloat()))),
+			new Rule("theta1", "theta_1", new RRef("theta", new Rule("", "", new RFloat()))),
+			new Rule("theta2", "theta_2", new RRef("theta", new Rule("", "", new RFloat()))),
 		])),
 		new Rule("HKY85", "HKY85", new RParam([
-			new Rule("kappa", "kappa", new RRef(
-				new Rule("kappa", "kappa", new RFloat())
-			)),
-			new Rule("theta", "theta", new RRef(
-				new Rule("theta", "theta", new RFloat())
-			)),
-			new Rule("theta1", "theta", new RRef(
-				new Rule("theta1", "theta_1", new RFloat())
-			)),
-			new Rule("theta2", "theta", new RRef(
-				new Rule("theta2", "theta_2", new RFloat())
-			)),
+			new Rule("kappa", "kappa", new RRef("kappa", new Rule("", "", new RFloat()))),
+			new Rule("theta", "theta", new RRef("theta", new Rule("", "", new RFloat()))),
+			new Rule("theta1", "theta_1", new RRef("theta", new Rule("", "", new RFloat()))),
+			new Rule("theta2", "theta_2", new RRef("theta", new Rule("", "", new RFloat()))),
 		])),
 		new Rule("T92", "T92", new RParam([
-			new Rule("kappa", "kappa", new RRef(
-				new Rule("kappa", "kappa", new RFloat())
-			)),
-			new Rule("theta", "theta", new RRef(
-				new Rule("theta", "theta", new RFloat())
-			)),
+			new Rule("kappa", "kappa", new RRef("kappa", new Rule("", "", new RFloat()))),
+			new Rule("theta", "theta", new RRef("theta", new Rule("", "", new RFloat()))),
 		])),
 		new Rule("TN93", "TN93", new RParam([
-			new Rule("kappa1", "kappa", new RRef(
-				new Rule("kappa1", "kappa_1", new RFloat())
-			)),
-			new Rule("kappa2", "kappa", new RRef(
-				new Rule("kappa2", "kappa_2", new RFloat())
-			)),
-			new Rule("theta", "theta", new RRef(
-				new Rule("theta", "theta", new RFloat())
-			)),
-			new Rule("theta1", "theta", new RRef(
-				new Rule("theta1", "theta_1", new RFloat())
-			)),
-			new Rule("theta2", "theta", new RRef(
-				new Rule("theta1", "theta_1", new RFloat())
-			)),
+			new Rule("kappa1", "kappa_1", new RRef("kappa", new Rule("", "", new RFloat()))),
+			new Rule("kappa2", "kappa_2", new RRef("kappa", new Rule("", "", new RFloat()))),
+			new Rule("theta", "theta", new RRef("theta", new Rule("", "", new RFloat()))),
+			new Rule("theta1", "theta_1", new RRef("theta", new Rule("", "", new RFloat()))),
+			new Rule("theta2", "theta_2", new RRef("theta", new Rule("", "", new RFloat()))),
 		])),
 	])),
-	"root": new Rule("Root frequencies", "root", new RParam([
+	"root": new Rule("Root frequencies", "root", new RAny([
+		new Rule("Fixed", "Fixed", new RParam([])),
+		new Rule("GC", "GC", new RParam([
+			new Rule("kappa", "kappa", new RPropor()),
+		])),
 	])),
 	"rate": new Rule("Substitution rate", "rate", new RAny([
+		new Rule("Constant", "Constant"),
 	])),
-	"proc": new Rule("Evolutionary process", "proc", new RAny([
+	"proc": new Rule("Evolutionary process", "process", new RAny([
+		new Rule("Homogenous", "Homogenous", new RParam([
+			new Rule("Tree", "tree", new RAnyRef("input.tree", []), true),
+			new Rule("Model", "$model", new RAnyRef("model", []), true),
+			new Rule("Rate", "$rate", new RAnyRef("rate", []), true),
+			new Rule("Root", "root_freq", new RAnyRef("root", [])),
+		])),
+		new Rule("NonHomogenous", "NonHomogenous", new RParam([
+			new Rule("Tree", "tree", new RAnyRef("input.tree", []), true),
+			new Rule("Model", "$model", new RVerbatim(), true),
+			new Rule("Rate", "$rate", new RAnyRef("rate", []), true),
+			new Rule("Root", "root_freq", new RAnyRef("root", [])),
+		])),
+		new Rule("OnePerBranch", "OnePerBranch", new RParam([
+			new Rule("Tree", "tree", new RAnyRef("input.tree", []), true),
+			new Rule("Model", "$model", new RVerbatim(), true),
+			new Rule("Rate", "$rate", new RAnyRef("rate", []), true),
+			new Rule("Root", "root_freq", new RAnyRef("root", [])),
+			new Rule("Shared parameters", "shared_parameters", new RVerbatim()),
+		])),
+		/*
+		new Rule("Mixture", "Mixture", new RAny([
+			new Rule("Process", "$process", new RAnyRef("process", new ROnce([
+				new Rule("Process probabilities", "probas", new RDynVector(), true),
+			]))),
+		]), true),
+		new Rule("Auto-correlated", "AutoCorr", new RAny([
+			new Rule("Process", "$process", new RAnyRef("process", new ROnce([
+				new Rule("Autocorrelation probabilities", "probas", new RDynVector(), true),
+			]))),
+		]), true),
+		new Rule("HMM", "HMM", new RAny([
+			new Rule("Process", "$process", new RAnyRef("process", new ROnce([
+				new Rule("Transition probabilities", "probas", new RDynVector(2), true),
+			]))),
+		]), true),
+		new Rule("Partition", "Partition", new RAny([
+			new Rule("Process", "$process", new RAnyRef("process", new RAny([
+				new Rule("Parent ranges", "sites", new RVerbatim(), true, true),
+			]))),
+		]), true),
+		*/
 	])),
-	"phyl": new Rule("Phylogeny", "phyl", new RAny([
+	"phyl": new Rule("Phylogeny", "phylo", new RAny([
+		new Rule("Single", "Single", new RParam([
+			new Rule("Data", "data", new RAnyRef("input.data", []), true),
+			new Rule("Process", "$process", new RAnyRef("process", []), true),
+		])),
+		new Rule("Double", "Double", new RParam([
+			new Rule("Data", "data", new RAnyRef("input.data", []), true),
+			new Rule("Process", "$process", new RAnyRef("process", []), true),
+		])),
+	]), true),
+	"result": new Rule("Result", "result", new ROne([
+		new Rule("", "", new RString(""), true),
 	])),
 };
 const options: { [name: string]: BppOpt } = {
@@ -155,10 +183,7 @@ const options: { [name: string]: BppOpt } = {
 	"rate": new BppOpt("rate"),
 	"proc": new BppOpt("proc"),
 	"phyl": new BppOpt("phyl"),
+	"result": new BppOpt("result"),
 };
-let reftab: { [name: string]: Sym[] } = {};
-let refeltab: { [name: string]: VRefElem[] } = {};
-let files: { [index: string]: HTMLInputElement } = {};
-let errors: {err:string, val:Value}[] = [];
 
 registersubmit();

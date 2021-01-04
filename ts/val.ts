@@ -8,8 +8,10 @@ interface Value{
 	readonly sym: Sym;
 	val: any;
 	set(val: any): boolean;
-	compile(): string;
+	compile(pref?: string): string;
 	pop(): void;
+	/* .el.popchild must ALWAYS be called last, once clean up is effective
+	 * otherwise sym refs will be stale AFTER element update and cannot be relied upon */
 	popchild?(sym: Sym): void;
 }
 
@@ -139,6 +141,49 @@ class VString implements Value{
 		this.el.pop();
 	}
 }
+/*
+class VVector implements Value{
+	readonly el: VVectorElem;
+	readonly sym;
+	readonly dim;
+	val: number[];
+
+	constructor(r: RVector, sym: Sym){
+		this.dim = r.nelem;
+		this.sym = sym;
+		this.val = [];
+		for(let i=0; i<r.nelem; i++)
+			this.val.push([]);
+		this.el = new VVectorElem(this);
+	}
+	set(dim: number, val: number[]){
+		if(dim >= this.dim)
+			fatal(this.sym.ref() + ": invalid dimension " + dim + " (max " + this.dim + ")");
+		this.val[dim] = val;
+		return true;
+	}
+	compile(){
+		let s = "=";
+		if(this.dim > 1)
+			s += "(";
+		for(let i=0; i<this.dim; i++){
+			if(this.val[i].length === 0){
+				pusherror(this.sym.ref() + ": uninitialized vector, index " + i, this);
+				return "=(null)";
+			}
+			if(i > 0)
+				s += ",";
+			s += "(" + this.val[i].toString() + ")";
+		}
+		if(this.dim > 1)
+			s += ")";
+		return s;
+	}
+	pop(){
+		this.el.pop();
+	}
+}
+*/
 class VVerbatim implements Value{
 	readonly el: VVerbatimElem;
 	readonly sym: Sym;
@@ -189,7 +234,7 @@ class VFile implements Value{
 			return "=(null)";
 		}
 		files[this.sym.parent.ref()] = this.el.getfile();
-		return "=" + this.val;
+		return "=" + this.sym.parent.ref();
 	}
 	pop(){
 		if(this.sym.parent instanceof BppOpt)
@@ -218,10 +263,23 @@ class VAny implements Value{
 		this.val.push(new Sym(this.sym, this.rules[i]));
 		return true;
 	}
-	compile(){
+	compile(pref: string){
+		/* at least one */
+		for(let i=0; i<this.rules.length; i++){
+			const r = this.rules[i];
+			if(r.mandatory){
+				let j;
+				for(j=0; j<this.val.length; j++)
+					if(this.val[j].rule === r)
+						break;
+				if(j === this.val.length)
+					pusherror(this.sym.ref() + ": undefined mandatory parameter " + r.rsym, this);
+			}
+		};
+		pref += this.sym.rule.rsym;
 		let s: string = "";
 		this.val.forEach((v, i) => {
-			s += this.sym.rule.rsym + (i+1) + "=" + v.compile() + "\n";
+			s += pref + (i+1) + "=" + v.compile() + "\n";
 		});
 		return s;
 	}
@@ -239,8 +297,8 @@ class VAny implements Value{
 	}
 	popchild(sym: Sym){
 		const i = this.index(sym);
-		this.el.popchild(i);
 		this.val.splice(i, 1);
+		this.el.popchild(i);
 	}
 	pop(){
 		this.nuke();
@@ -263,17 +321,28 @@ class VOnce implements Value{
 		if(i >= this.rules.length)
 			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
 		const r = this.rules[i];
-		if(this.val.hasOwnProperty(r.rsym)){
+		if(this.val.hasOwnProperty(r.rsym))
 			this.val[r.rsym].pop();
-			delete this.val[r.rsym];
-		}
 		this.val[r.rsym] = new Sym(this.sym, r);
 		return true;
 	}
-	compile(){
+	compile(pref: string){
+		const k = Object.keys(this.val);
+		for(let i=0; i<this.rules.length; i++){
+			const r = this.rules[i];
+			if(r.mandatory){
+				let j;
+				for(j=0; j<k.length; j++)
+					if(this.val[k[j]].rule === r)
+						break;
+				if(j === k.length)
+					pusherror(this.sym.ref() + ": undefined mandatory parameter " + r.rsym, this);
+			}
+		};
+		pref += this.sym.rule.rsym;
 		let s: string = "";
-		Object.keys(this.val).forEach((k) => {
-			s += this.sym.rule.rsym + "=" + this.val[k].compile() + "\n";
+		k.forEach((k) => {
+			s += pref + this.sym.rule.rsym + "=" + this.val[k].compile() + "\n";
 		});
 		return s;
 	}
@@ -310,20 +379,29 @@ class VParam implements Value{
 		if(i >= this.rules.length)
 			fatal(this.sym.ref() + ".set: index out of bounds: " + i);
 		const r = this.rules[i];
-		if(this.val.hasOwnProperty(r.rsym)){
+		if(this.val.hasOwnProperty(r.rsym))
 			this.val[r.rsym].pop();
-			delete this.val[r.rsym];
-		}
 		this.val[r.rsym] = new Sym(this.sym, r);
 		return true;
 	}
 	compile(){
-		let s = "(";
 		const k = Object.keys(this.val);
+		for(let i=0; i<this.rules.length; i++){
+			const r = this.rules[i];
+			if(r.mandatory){
+				let j;
+				for(j=0; j<k.length; j++)
+					if(this.val[k[j]].rule === r)
+						break;
+				if(j === k.length)
+					pusherror(this.sym.ref() + ": undefined mandatory parameter " + r.rsym, this);
+			}
+		};
+		let s = "(";
 		for(let i=0; i<k.length; i++){
-			s += this.val[k[i]].compile();
-			if(i < k.length - 1)
+			if(i > 0)
 				s += ", ";
+			s += this.val[k[i]].compile();
 		}
 		return s + ")";
 	}
@@ -377,8 +455,8 @@ class VOne implements Value{
 	popchild(sym: Sym){
 		if(this.val !== sym)
 			fatal(this.sym.ref() + ".popchild: no such element " + sym.ref());
-		this.el.popchild();
 		this.val = null;
+		this.el.popchild();
 	}
 	pop(){
 		this.nuke();
@@ -388,61 +466,153 @@ class VOne implements Value{
 
 class VRef implements Value{
 	readonly el: VRefElem;
+	readonly rref: RRef;
 	readonly sym: Sym;
-	readonly rule: Rule;
-	readonly refidx: string;
-	readonly reftab: Sym[];
+	valref: Sym | null;
 	val: Sym | null;
-	ref: Sym | null;
 
-	constructor(r: RRef, sym: Sym){
+	constructor(rref: RRef, sym: Sym){
 		this.sym = sym;
-		this.rule = r.rule;
-		this.refidx = sym.rule.rsym;
-		if(!reftab.hasOwnProperty(this.refidx))
-			reftab[this.refidx] = [];
-		this.reftab = reftab[this.refidx];
+		this.rref = rref;
+		rref.ref.addref(this);
+		this.valref = null;
 		this.val = null;
-		this.ref = null;
 		this.el = new VRefElem(this);
 	}
-	set(i: number | null){
-		this.popchild();
-		if(i !== null){
-			if(i >= this.reftab.length)
-				fatal(this.sym.ref() + ".set: index out of bounds: " + i);
-			this.ref = this.reftab[i];
-		}else{
-			this.val = new Sym(this.sym, this.rule);
-			this.reftab.push(this.val);
-		}
+	set(sym: Sym){
+		/* FIXME: can be fooled by $
+		if(sym.rule.rsym !== this.rref.ref.name)
+			fatal(this.sym.ref() + ".setref: phase error: wrong reftable for sym " + sym.ref());
+		*/
+		/* FIXME: no, children
+		const rs = this.rref.ref.syms;
+		let i;
+		for(i=0; i<rs.length; i++)
+			if(rs[i] === sym)
+				break;
+		if(i === rs.length)
+			fatal(this.sym.ref() + ".setref: phase error: no such sym in reftable " + sym.ref());
+		*/
+		this.nuke();
+		this.valref = sym;
 		return true;
+	}
+	pushval(){
+		this.nuke();
+		this.val = new Sym(this.sym, this.rref.rule);
+		return true;
+	}
+	addsymref(sym: Sym){
+		this.el.addsymref(sym);
+	}
+	removesymref(sym: Sym){
+		this.el.removesymref(sym);
+		this.nuke();
 	}
 	compile(){
 		if(this.val !== null)
-			return "=" + this.val.compile();
-		else if(this.ref !== null){
-			return "=" + this.ref.ref();
-		}else{
+			/* shunt this.val.compile() to skip ref name */
+			return this.val.val!.compile();
+		else if(this.valref !== null)
+			return "=" + this.valref.ref();
+		else{
 			pusherror(this.sym.ref() + ": uninitialized value", this);
 			return "=(null)";
 		}
 	}
+	nuke(){
+		if(this.val !== null)
+			this.val.pop();
+		this.valref = null;
+	}
+	popchild(sym: Sym){
+		this.val = null;
+		this.el.popchild(sym);
+	}
 	pop(){
-		this.popchild();
+		this.nuke();
 		this.el.pop();
 	}
-	popchild(){
-		if(this.val !== null){
-			this.val.pop();
-			for(let i=0; i<this.reftab.length; i++)
-				if(this.reftab[i] == this.sym){
-					this.reftab.splice(i, 1);
-					break;
-				}
-			this.el.popchild();
+}
+class VAnyRef implements Value{
+	readonly el: VAnyRefElem;
+	readonly rref: RAnyRef;
+	readonly sym: Sym;
+	readonly rules: Rule[];
+	symref: Sym | null;
+	/* syms depending on referenced sym */
+	val: { [name: string]: Sym; };
+
+	constructor(rref: RAnyRef, sym: Sym){
+		this.sym = sym;
+		this.rref = rref;
+		rref.ref.addref(this);
+		this.rules = rref.rules;
+		this.symref = null;
+		this.val = {};
+		this.el = new VAnyRefElem(this);
+	}
+	set(sym: Sym){
+		/* FIXME: can be fooled by $
+		if(sym.rule.rsym !== this.rref.ref.name)
+			fatal(this.sym.ref() + ".setref: phase error: wrong reftable for sym " + sym.ref());
+		*/
+		/* FIXME: no, children
+		const rs = this.rref.ref.syms;
+		let i;
+		for(i=0; i<rs.length; i++)
+			if(rs[i] === sym)
+				break;
+		if(i === rs.length)
+			fatal(this.sym.ref() + ".setref: phase error: no such sym in reftable " + sym.ref());
+		*/
+		this.nuke();
+		this.symref = sym;
+		return true;
+	}
+	pushval(i: number){
+		(i);
+		/* FIXME:
+		 *	- embedded rules are linked to this ref
+		 *	- if the rule is ROnce, then there is only one such SIBLING to this ref, with a corresponding SIZE (vector)
+		 *	- if the rule is RAny, then there are as many such SIBLINGS as there are such REFS
+		 *	- for this, we need to:
+		 *		. implement pushval, pop, popchild here
+		 *		. implement them in the dom
+		 *		. allow setting these values in the dom without all these hoops
+		 *		. implement DynVector + dom
+		 *		. implement compilation of this garbage
+		 *		. sacrifice goat and pray
+		 */
+	}
+	addsymref(sym: Sym){
+		this.el.addsymref(sym);
+	}
+	removesymref(sym: Sym){
+		this.el.removesymref(sym);
+		this.nuke();
+	}
+	compile(){
+		if(this.symref === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
 		}
-		this.val = null;
-		this.ref = null;
+		let s = "=";
+		s += (((this.symref.parent as Sym).val as VAny).index(this.symref) + 1);
+		/* FIXME: compilation of linked rules, see above */
+		return s;
+	}
+	nuke(){
+		/* FIXME: nuke semantics for subrules */
+		this.val = {};
+		this.symref = null;
+	}
+	popchild(sym: Sym){
+		/* FIXME: popchild semantics for subrules */
+		this.el.popchild(sym);
+	}
+	pop(){
+		this.nuke();
+		this.el.pop();
 	}
 }

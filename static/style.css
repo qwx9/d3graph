@@ -1,0 +1,11 @@
+:root{
+	--card-back-color: #eeeeff;
+}
+select{
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+button.small{
+	padding-top: 0px;
+	padding-bottom: 0px;
+}

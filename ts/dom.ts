@@ -97,6 +97,7 @@ function addtext(parent: HTMLElement, text: string | null, action: () => void){
 function addfile(parent: HTMLElement, action: () => void){
 	const e = newelement("input") as HTMLInputElement;
 	e.setAttribute("type", "file");
+	e.style.display = "inline";
 	e.addEventListener("change", action);
 	parent.appendChild(e);
 	return e;

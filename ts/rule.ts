@@ -53,6 +53,18 @@ class RString implements Ruleval{
 		return new VString(this, sym);
 	}
 }
+/*
+class RVector implements Ruleval{
+	readonly nelem: number;
+
+	constructor(nelem: number = 1){
+		this.nelem = nelem;
+	}
+	putval(sym: Sym): Value{
+		return new VVector(this, sym);
+	}
+}
+*/
 class RVerbatim implements Ruleval{
 	constructor(){
 	}
@@ -108,24 +120,50 @@ class ROne implements Ruleval{
 	}
 }
 class RRef implements Ruleval{
+	readonly refname: string;
 	readonly rule: Rule;
+	readonly ref: Ref;
 
-	constructor(rule: Rule){
+	constructor(refname: string, rule: Rule){
+		this.refname = refname;
 		this.rule = rule;
+		if(!reftab.hasOwnProperty(refname))
+			reftab[refname] = new Ref(refname);
+		this.ref = reftab[refname];
 	}
 	putval(sym: Sym): Value{
 		return new VRef(this, sym);
 	}
 }
+class RAnyRef implements Ruleval{
+	readonly refname: string;
+	readonly rules: Rule[];
+	readonly ref: Ref;
+
+	constructor(refname: string, rules: Rule[]){
+		this.refname = refname;
+		this.rules = rules;
+		if(!reftab.hasOwnProperty(refname))
+			reftab[refname] = new Ref(refname);
+		this.ref = reftab[refname];
+	}
+	putval(sym: Sym): Value{
+		return new VAnyRef(this, sym);
+	}
+}
 class Rule{
 	readonly label: string;
 	readonly rsym: string;
+	readonly mandatory: boolean;
+	readonly inheritname: boolean;
 	readonly val: Ruleval | null;
 
-	constructor(label: string, rsym: string, val: Ruleval | null = null){
+	constructor(label: string, rsym: string, val: Ruleval | null = null, mandatory: boolean = false, inheritname: boolean = false){
 		this.label = label;
 		this.rsym = rsym;
 		this.val = val;
+		this.mandatory = mandatory;
+		this.inheritname = inheritname;
 	}
 	putval(sym: Sym): Value{
 		if(this.val === null)

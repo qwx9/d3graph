@@ -1,13 +1,16 @@
-- types for references: RValueRef, RRuleRef, RTreeRef
-	* no point in complexifying types, just make new ones
-	* way to add an update function to fix state when changing RRuleRef/RTreeRef
-		. RTreeRef optional update() arg?
-- add root, rate, proc, phyl
-	* multiple and exclusive values: combination of phyl or proc + data
-		=> maybe final phylogeny is refs to phylogeny + op ≠ any phylogeny, proc + data
-⇒ this solves everything
-- check valid bpp output
+- check valid bpp output for a few models
+- !! add new value -> added to list ref of same element!
+	* should also remove the select altogether
+	* also select option doesn't skip ref
+- uncaught error undefined when entering GC() kappa popchild->pop app.js:730
+
+- visuals/css: minimal css-only framework
+	* tool tips with required type of value => verbatim: non-empty string, etc
+	* file input shit sucks
+	* use accordions to collapse existing shit (or add the ability for it anyway)
+- implement RDynVector
 - implement list based on predicate (model list based on alphabet)
+	* RTreeRef with way to have an arbitrary update function
 	* multiple rule tables and refs between them
 	* distribution table, model tables by type
 	* refs to trees of rules, mutable or not
@@ -15,39 +18,40 @@
 		- any model with any whatever
 		- so, associative arrays? arrays with all (redundant) possibilities?
 		  array of concatenated sets?
-
+- proc: Root optional, the rest isn't
+	=> mandatory flag in RParam
 - error checking
 	* must have one phylogeny defined
 		- which in turn implies model, data, etc
 	* input stuff must have a (non-empty) path= param
+	* unused data/tree/model etc
 - add fourre-tout toplevel options
+- submissal: rename files: keep extension if any, and substitute the rest
 - output ui result and edit prior to submit ⇒ textarea
 	* manually upload bpp file ⇒ load into text area
 	* then submit as is
 	* make sure we don't overwrite gui state if the text was changed manually
-- start thinking about ruleset spec language and transpilation to ts
-- visuals/css: minimal css-only framework
-	* tooltips for description/type/information/links to doc
-	* left pane: list of model components
-	* right pane: onselect, description
-	* hide unused/uninitialized primitives?
-	* do as little css customization as possible
-	* file input shit sucks
+	* if we do this, there's no guarantee file paths would be valid,
+	so shouldn't be editable? or reparse to make sure? we can't hand weird paths to
+	the server
+	* ideally would be nice, but we should just output a non-editable compilation result
+	like we do now
+- ruleset spec language and transpilation to ts
+- server response
+	* disable buttons while waiting
+	* error → enable them again
+	* success → redirect
+- graceful recovery from fatal error: right now, an error/bug results in invalid state
+- more stuff + bppml specific options
+- aliases
+	* forward/backward aliases?
+- documentation, links towards
+	* note: as stateless as possible (which also means redundancies)
+	* root elements are treated differently and full of exceptions...
 
 
 - val.ts: ValueElem .el in interface and add standard .set() and .pop()/.nuke()/etc
 
-
-- more stuff + bppml specific options
-- aliases
-	* forward/backward aliases?
-
-
-- variable naming in bpp: model1-2-3: model1 parameter _1, see how shit is automatically named
-	. important for references
-	. HKY85.kappa_1, not model1.kappa
-	. but in spec: process1=Nonhomogeneous(model1=1, model2=2)
-		tree=2, rate=1, etc.
-- documentation, links towards
-	* note: as stateless as possible (which also means redundancies)
-	* root elements are treated differently and full of exceptions...
+- presentation: ce que fait bppsuite, signification scientifique de nos resultats, et la demo ne doit pas juste etre une visite de parc, il faut nommer precisement le sens des params, des donnees, etc utilises
+	soutenance, pas a montrer la vm, une execution etc
+	9h50
