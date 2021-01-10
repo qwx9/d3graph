@@ -1,6 +1,33 @@
+/* main source file. this is the only file containing declarations and
+ * instructions, all other files only declare new classes and functions.
+ * all global variables are declared and instanciated recursively here. */
+
+/* reference table used for sym pointers. must be defined BEFORE ruleset
+ * since Rule instanciation creates ref elements used later! */
 let reftab: { [name: string]: Ref } = {};
+
+/* file table associative array, accessed by symbol name. to avoid
+ * conflicts and invalid state, generated only at compilation. */
 let files: { [index: string]: HTMLInputElement } = {};
+/* errors generated during compilation. regenerated at compilation and
+ * contains error string and offending value node (currently unused). */
 let errors: {err:string, val:Value|BppOpt}[] = [];
+
+/* ruleset graph declaration and initialization. this is the template
+ * for any new model and specifies what model elements can be created
+ * and how. rules use a somewhat confusing syntax for recursivity, and
+ * specify a root symbol, then its value, which is a "data" rule, which
+ * in turn has its own semantics to specify a primitive type, or lists,
+ * functions, references, etc. this is necessary to preserve a maximally
+ * general structure while allowing for all the eccentricities of a bpp
+ * model specification. unfortunately, some of the possibilities add a
+ * lot of complexity. rules first specify an on-screen label, then the
+ * internal label used in bpp files, then a data rule, then other=
+ * optional parameters.
+ * 
+ * special case: use a special character `$' stripped after compilation
+ * to avoid erroneous references when symbols would reuse the same name.
+ */
 const rules: { [name: string]: Rule } = {
 	"alphabet": new Rule("Alphabet", "alphabet", new ROne([
 		new Rule("DNA", "DNA"),
@@ -173,6 +200,9 @@ const rules: { [name: string]: Rule } = {
 		new Rule("", "", new RString(""), true),
 	])),
 };
+/* create root elements to generate initial empty state from which new
+ * expressions may be spawned. names correspond to those of ruleset
+ * elements. */
 const options: { [name: string]: BppOpt } = {
 	"alphabet": new BppOpt("alphabet"),
 	"gencode": new BppOpt("gencode"),
@@ -186,4 +216,5 @@ const options: { [name: string]: BppOpt } = {
 	"result": new BppOpt("result"),
 };
 
+/* create compilation and submissal buttons, and register event handlers */
 registersubmit();

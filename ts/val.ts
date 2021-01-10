@@ -1,8 +1,10 @@
+
+
 /* judicious use of inheritance would simplify a lot of the copypasta and
- * enforce more rules when implementing a new Value type
- */
-/* contorsions are sometimes required to avoid silly typescript annoyances,
- * especially for union types
+ * enforce more rules when implementing a new Value type.
+ *
+ * contorsions are sometimes required to avoid silly typescript annoyances,
+ * especially for union types.
  */
 interface Value{
 	readonly sym: Sym;
@@ -573,16 +575,16 @@ class VAnyRef implements Value{
 	pushval(i: number){
 		(i);
 		/* FIXME:
-		 *	- embedded rules are linked to this ref
-		 *	- if the rule is ROnce, then there is only one such SIBLING to this ref, with a corresponding SIZE (vector)
-		 *	- if the rule is RAny, then there are as many such SIBLINGS as there are such REFS
-		 *	- for this, we need to:
-		 *		. implement pushval, pop, popchild here
-		 *		. implement them in the dom
-		 *		. allow setting these values in the dom without all these hoops
-		 *		. implement DynVector + dom
-		 *		. implement compilation of this garbage
-		 *		. sacrifice goat and pray
+		 * - embedded rules are linked to this ref
+		 * - if the rule is ROnce, then there is only one such SIBLING to this ref, with a corresponding SIZE (vector)
+		 * - if the rule is RAny, then there are as many such SIBLINGS as there are such REFS
+		 * - for this, we need to:
+		 * 	. implement pushval, pop, popchild here
+		 * 	. implement them in the dom
+		 * 	. allow setting these values in the dom without all these hoops
+		 * 	. implement DynVector + dom
+		 * 	. implement compilation of this garbage
+		 * 	. sacrifice goat and pray
 		 */
 	}
 	addsymref(sym: Sym){

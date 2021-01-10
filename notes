@@ -3,6 +3,10 @@
 	* should also remove the select altogether
 	* also select option doesn't skip ref
 - uncaught error undefined when entering GC() kappa popchild->pop app.js:730
+- css bullshit, window needs to be large else divs get reordered or invisible
+- grep FIXME
+
+- alphabet/model list selection must be implemented
 
 - visuals/css: minimal css-only framework
 	* tool tips with required type of value => verbatim: non-empty string, etc
@@ -45,10 +49,6 @@
 - more stuff + bppml specific options
 - aliases
 	* forward/backward aliases?
-- documentation, links towards
-	* note: as stateless as possible (which also means redundancies)
-	* root elements are treated differently and full of exceptions...
-
 
 - val.ts: ValueElem .el in interface and add standard .set() and .pop()/.nuke()/etc
 
