@@ -385,9 +385,9 @@ class VRefElem{
 		});
 	}
 	sel(i: number){
-		if(i == 1)
+		if(i == 0)
 			this.val.nuke();
-		else if(i == 2)
+		else if(i == 1)
 			this.val.pushval();
 		else
 			this.val.set(this.opts[i-2].s);

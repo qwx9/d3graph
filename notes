@@ -7,6 +7,7 @@
 - grep FIXME
 
 - model var: select new value → doesn't do anything
+- test screen sharing, get windows disk as well
 
 - alphabet/model list selection must be implemented
 - initfreqs=values(...)|observed
