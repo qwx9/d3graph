@@ -16,6 +16,8 @@ function compile(){
 	let s: string = "";
 	for(let k in options)
 		s += options[k].compile().replace(/\$/g, "");
-	s += forcedparms;
+	forcedparms.forEach((p) => {
+		s += p + "\n";
+	});
 	return s;
 }

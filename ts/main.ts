@@ -211,13 +211,13 @@ const rules: { [name: string]: Rule } = {
 	])),
 };
 /* config parameters always appended to compilation output. */
-const forcedparms =
-	"optimization.profiler=input.profile" +
-	"output.tree.file=output.dnd" +
-	"output.tree.format=Newick" +
-	"output.infos=output.infos" +
-	"output.estimates=output.params.txt" +
-	"";
+const forcedparms = [
+	"optimization.profiler=input.profile",
+	"output.tree.file=output.dnd",
+	"output.tree.format=Newick",
+	"output.infos=output.infos",
+	"output.estimates=output.params.txt",
+];
 
 /* create root elements to generate initial empty state from which new
  * expressions may be spawned. names correspond to those of ruleset
