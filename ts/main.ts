@@ -26,7 +26,9 @@ let errors: {err:string, val:Value|BppOpt}[] = [];
  * optional parameters.
  * 
  * special case: use a special character `$' stripped after compilation
- * to avoid erroneous references when symbols would reuse the same name.
+ * to avoid erroneous references when symbols would reuse the same name
+ * (when the parameter name is the same as what it is supposed to
+ * reference as in: rate=[rate refs]).
  */
 const rules: { [name: string]: Rule } = {
 	"alphabet": new Rule("Alphabet", "alphabet", new ROne([
@@ -89,6 +91,14 @@ const rules: { [name: string]: Rule } = {
 				new Rule("Genbank", "Genbank", new RParam([
 				])),
 			]), true),
+			new Rule("Sites to use", "sites_to_use", new ROne([
+				new Rule("All", "all"),
+				new Rule("No Gaps", "nogap"),
+				new Rule("Complete", "complete"),
+			])),
+			new Rule("Remove stop codons", "remove_stop_codons", new RBool()),
+			new Rule("Max allowed gap ratio", "max_gap_allowed", new RPropor()),
+			new Rule("Max allowed unresolved ratio", "max_unresolved_allowed", new RPropor()),
 		])),
 	])),
 	"tree": new Rule("Tree data", "input.tree", new RAny([
@@ -140,26 +150,26 @@ const rules: { [name: string]: Rule } = {
 			new Rule("kappa", "kappa", new RPropor()),
 		])),
 	])),
-	"rate": new Rule("Substitution rate", "rate", new RAny([
+	"rate": new Rule("Substitution rate", "rate_distribution", new RAny([
 		new Rule("Constant", "Constant"),
 	])),
 	"proc": new Rule("Evolutionary process", "process", new RAny([
-		new Rule("Homogenous", "Homogenous", new RParam([
+		new Rule("Homogeneous", "Homogeneous", new RParam([
 			new Rule("Tree", "tree", new RAnyRef("input.tree", []), true),
 			new Rule("Model", "$model", new RAnyRef("model", []), true),
-			new Rule("Rate", "$rate", new RAnyRef("rate", []), true),
+			new Rule("Rate", "rate", new RAnyRef("rate_distribution", []), true),
 			new Rule("Root", "root_freq", new RAnyRef("root", [])),
 		])),
-		new Rule("NonHomogenous", "NonHomogenous", new RParam([
+		new Rule("NonHomogeneous", "NonHomogeneous", new RParam([
 			new Rule("Tree", "tree", new RAnyRef("input.tree", []), true),
 			new Rule("Model", "$model", new RVerbatim(), true),
-			new Rule("Rate", "$rate", new RAnyRef("rate", []), true),
+			new Rule("Rate", "rate", new RAnyRef("rate_distribution", []), true),
 			new Rule("Root", "root_freq", new RAnyRef("root", [])),
 		])),
 		new Rule("OnePerBranch", "OnePerBranch", new RParam([
 			new Rule("Tree", "tree", new RAnyRef("input.tree", []), true),
 			new Rule("Model", "$model", new RVerbatim(), true),
-			new Rule("Rate", "$rate", new RAnyRef("rate", []), true),
+			new Rule("Rate", "rate", new RAnyRef("rate_distribution", []), true),
 			new Rule("Root", "root_freq", new RAnyRef("root", [])),
 			new Rule("Shared parameters", "shared_parameters", new RVerbatim()),
 		])),
@@ -200,6 +210,10 @@ const rules: { [name: string]: Rule } = {
 		new Rule("", "", new RString(""), true),
 	])),
 };
+/* config parameters always appended to compilation output. */
+const forcedparms =
+	"output.tree.file=output.dnd";
+
 /* create root elements to generate initial empty state from which new
  * expressions may be spawned. names correspond to those of ruleset
  * elements. */

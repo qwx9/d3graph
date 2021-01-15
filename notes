@@ -6,7 +6,10 @@
 - css bullshit, window needs to be large else divs get reordered or invisible
 - grep FIXME
 
+- model var: select new value → doesn't do anything
+
 - alphabet/model list selection must be implemented
+- initfreqs=values(...)|observed
 
 - visuals/css: minimal css-only framework
 	* tool tips with required type of value => verbatim: non-empty string, etc
