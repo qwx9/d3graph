@@ -264,7 +264,7 @@ class VFile implements Value{
 			return "=(null)";
 		}
 		files[this.sym.parent.ref()] = this.el.getfile();
-		return "=" + this.sym.parent.ref();
+		return "=" + "data/" + this.sym.parent.ref();
 	}
 	pop(){
 		if(this.sym.parent instanceof BppOpt)

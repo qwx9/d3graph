@@ -6,7 +6,8 @@
 - css bullshit, window needs to be large else divs get reordered or invisible
 - grep FIXME
 
-- model var: select new value → doesn't do anything
+- model.ref.value → model.ref.
+	* just fix references instead with new idea: reference everything
 - test screen sharing, get windows disk as well
 
 - alphabet/model list selection must be implemented
