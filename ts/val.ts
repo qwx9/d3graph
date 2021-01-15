@@ -64,6 +64,34 @@ class VInteger implements Value{
 		this.el.pop();
 	}
 }
+class VPercent implements Value{
+	readonly el: VPercentElem;
+	readonly sym: Sym;
+	val: number | null;
+
+	constructor(r: RPercent, sym: Sym){
+		this.val = r.def;
+		this.sym = sym;
+		this.el = new VPercentElem(this);
+	}
+	set(val: number){
+		const v = Math.floor(val);
+		if(v < 0 || v > 100)
+			return false;
+		this.val = v;
+		return true;
+	}
+	compile(){
+		if(this.val === null){
+			pusherror(this.sym.ref() + ": uninitialized value", this);
+			return "=(null)";
+		}
+		return "=" + this.val.toString() + "%";
+	}
+	pop(){
+		this.el.pop();
+	}
+}
 class VPropor implements Value{
 	readonly el: VProporElem;
 	readonly sym: Sym;

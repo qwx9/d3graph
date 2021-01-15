@@ -35,6 +35,25 @@ class VIntegerElem{
 		this.span.remove();
 	}
 }
+class VPercentElem{
+	readonly val: VPercent;
+	readonly sym: Sym;
+	readonly span: HTMLSpanElement;
+	readonly text: HTMLInputElement;
+
+	constructor(val: VPercent){
+		this.val = val;
+		this.sym = val.sym;
+		this.span = addspan(val.sym.el.value, "=");
+		this.text = addtext(this.span, this.val.val === null ? "" : this.val.val.toString(), () => {
+			if(this.val.set(parseInt(this.text.value)))
+				this.text.value = this.val.val!.toString();
+		});
+	}
+	pop(){
+		this.span.remove();
+	}
+}
 class VProporElem{
 	readonly val: VPropor;
 	readonly sym: Sym;

@@ -97,8 +97,8 @@ const rules: { [name: string]: Rule } = {
 				new Rule("Complete", "complete"),
 			])),
 			new Rule("Remove stop codons", "remove_stop_codons", new RBool()),
-			new Rule("Max allowed gap ratio", "max_gap_allowed", new RPropor()),
-			new Rule("Max allowed unresolved ratio", "max_unresolved_allowed", new RPropor()),
+			new Rule("Max allowed gap %", "max_gap_allowed", new RPercent()),
+			new Rule("Max allowed unresolved %", "max_unresolved_allowed", new RPercent()),
 		])),
 	])),
 	"tree": new Rule("Tree data", "input.tree", new RAny([

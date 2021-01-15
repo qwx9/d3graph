@@ -10,6 +10,9 @@
 
 - alphabet/model list selection must be implemented
 - initfreqs=values(...)|observed
+- no error message when numeric value is not accepted
+
+- one thing that would be nice: push model → push default process referencing the model, etc
 
 - visuals/css: minimal css-only framework
 	* tool tips with required type of value => verbatim: non-empty string, etc

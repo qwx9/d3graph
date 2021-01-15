@@ -54,7 +54,18 @@ class RInteger implements Ruleval{
 		return new VInteger(this, sym);
 	}
 }
-/* floats of range [0,1], with optional default value. */
+/* percentages 0-100, with optional default value. */
+class RPercent implements Ruleval{
+	readonly def: number | null;
+
+	constructor(def: number | null = null){
+		this.def = def;
+	}
+	putval(sym: Sym): Value{
+		return new VPercent(this, sym);
+	}
+}
+/* floats of range ]0,1[, with optional default value. */
 class RPropor implements Ruleval{
 	readonly def: number | null;
 
